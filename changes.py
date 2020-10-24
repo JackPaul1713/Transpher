@@ -44,7 +44,7 @@ def get_changes(old, new):
     # get adds
     #ret#
     return(changes)
-def get_conflicts(changes1, changes2):
+def get_conflicts(changes_a, changes_b):
     #init#
     #find conflicts#
     # get update conflicts (w del)
@@ -53,12 +53,12 @@ def get_conflicts(changes1, changes2):
     #ret#
     return
 
-def make_changes(src_root, dest_root):
+def make_changes(src_root, dest_root, changes):
     return
-def make_trans_changes_u(src_root, trans_root):
+def make_trans_changes_u(src_root, trans_root, changes):
     #adds, updates
     return
-def make_trans_changes_d(dest_root, trans_root):
+def make_trans_changes_d(dest_root, trans_root, changes):
     #adds, updates
     #moves, deletes
     return
