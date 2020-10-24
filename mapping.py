@@ -2,13 +2,16 @@
 # Description: Maps out a path and records it. Uses created date as a unique id.
 # Notes: .mpath files should be for containing string versions of mapped paths
 
+#do#
+# ADD exclusions
+
 #init#
 import os
 from ctypes import windll, wintypes, byref
 
 class MappedPath():
     def __init__(self, init):
-        if 'C:\\' in init and '<' not in init: # if init is a directory
+        if 'C:\\' in init and '<' not in init: # if init is a directory # ADD exclusions here
             #init#
             path = init
             #construct#
@@ -20,7 +23,7 @@ class MappedPath():
                 self.sub_mpaths = [MappedPath(p.path) for p in os.scandir(self.path)]
             else:
                 self.sub_mpaths = []
-        elif '<' in init: # if init is a mapped string # FIX THIS
+        elif '<' in init: # if init is a mapped string
             #init#
             mpath_str = init
             def init_id_str(mpath, id_str):
