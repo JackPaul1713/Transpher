@@ -2,36 +2,43 @@
 # Description: Can find changes to a mpath using a saved version of the mpath before changes.
 # Notes: root is the top mpath's path
 
+#TOD0#
 #do#
-# DO actions
-# DO funcs
+# actions
+# funcs
 
-#init#
+#add
+# None
+
+#test#
+# None
+
+#INIT#
 class Add():
     def __init__(self, path):
         self.type = 'add'
         self.path = path
     def action(self):
-        return
+        pass
 class Delete():
     def __init__(self, path):
         self.type = 'del'
         self.path = path
     def action(self):
-        return
+        pass
 class Move():
     def __init__(self, src_path, dest_path):
         self.type = 'mov'
         self.src = src_path
         self.dest = dest_path
     def action(self):
-        return
+        pass
 class Update():
     def __init__(self, path):
         self.type = 'upd'
         self.path = path
     def action(self):
-        return
+        pass
 
 def get_changes(old, new):
     #init#
