@@ -36,20 +36,20 @@ class Update():
 def get_changes(old, new):
     #init#
     changes = []
-
     #find changes#
-    # get updates
-    # get moves
-    # get deletes
+    # get updates (use mod date)
+    # get moves (use name and path)
+    # get deletes ()
     # get adds
     #ret#
     return(changes)
-def get_conflicts(changes_a, changes_b):
+def merge_changes(changes_a, changes_b):
     #init#
-    #find conflicts#
-    # get update conflicts (w del)
-    # get move conflicts (w del)
-    # order move and updates to prevent move update conflicts?
+    # split changes by type
+    # merge same type changes
+    # find update conflicts
+    # find move conflicts
+    # merge changes - updates, moves, adds deletes
     #ret#
     return
 
