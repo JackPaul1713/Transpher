@@ -36,7 +36,6 @@ class Update():
 def get_changes(old, new):
     #init#
     changes = []
-
     #find changes#
     # get updates
     # get moves

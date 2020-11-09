@@ -165,8 +165,6 @@ class MappedPath():
 if __name__ == '__main__':
     test_mpath = MappedPath('a*0*0<b*0*0<c*0*0<d*0*0<>d1*0*0<e*0*0<>>>>b1*0*0<>>')
     print(test_mpath.get_mpath_str())
-    test_mpath.make_ctime_unique()
-    print(test_mpath.get_mpath_str())
 
 # Author: Jack Paul Martin
 # Start: idk, Completion: 10/20/2020ish
