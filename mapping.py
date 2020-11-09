@@ -2,15 +2,28 @@
 # Description: Maps out a path and records it. Uses created date as a unique id.
 # Notes: .mpath files should be for containing string versions of mapped paths
 
-#do#
-# ADD exclusions
+#TOD0#
+#add#
+# None
 
-#init#
+#do#
+# None
+
+#test#
+# exclusions
+
+#INIT#
+#imports#
 import os
 from ctypes import windll, wintypes, byref
 
+#objects#
 class MappedPath():
-    def __init__(self, init):
+    '''
+    description: makes a map of a directory and all it's sub directories and files using their path , creation time, and modification time or a mpath_str
+    parameters: string path, string[] exclusions or string mpath.
+    '''
+    def __init__(self, init, exclusions=None):
         if 'C:\\' in init and '<' not in init: # if init is a directory # ADD exclusions here
             #init#
             path = init
@@ -20,7 +33,10 @@ class MappedPath():
             self.ctime = os.path.getctime(path)
             self.mtime = os.path.getmtime(path)
             if os.path.isdir(path):
-                self.sub_mpaths = [MappedPath(p.path) for p in os.scandir(self.path)]
+                self.sub_mpaths = []
+                for p in os.scandir(self.path):
+                    if p not in exclusions:
+                        self.sub_mpaths.append(MappedPath(p.path))
             else:
                 self.sub_mpaths = []
         elif '<' in init: # if init is a mapped string
@@ -56,6 +72,7 @@ class MappedPath():
 
     #search#
     def search(self, mpath_find): # CHANGE THIS, return a position list, pos[]
+        '''description: takes in a mapped path object and recursively searches itself for the mapped path and returns its position | parameters: self, MappedPath mpath_find | return: int[] pos'''
         def search_recur(mpath, mpath_find):
             #init#
             pos = []
@@ -71,6 +88,7 @@ class MappedPath():
                     return(pos)
         return(search_recur(self, mpath_find))
     def search_dup(self, mpath_find): # CHANGE THIS, return a position list, pos[]
+        '''description: takes in a mapped path object and recursively searches itself for duplicate of the mapped path and return its position | parameters: self, MappedPath mpath_find | return: int[] pos'''
         def search_recur(mpath, mpath_find):
             #init#
             pos = []
@@ -88,11 +106,13 @@ class MappedPath():
 
     #modify#
     def get_mpath_at_pos(self, pos):
+        '''description: takes in position and returns the mapped path object at that position| parameters: self, int[] pos | return: MappedPath mpath'''
         mpath = self
         for p in pos:
             mpath = mpath.sub_mpaths[p]
         return(mpath)
     def add_mpath_at_pos(self, mpath_add, pos):
+        '''description: takes in a mapped path object and position and adds the mpath at that position | parameters: self, MappedPath mpath_add, int[] pos | return: None'''
         def sub(mpath, mpath_add, pos):
             if len(pos) > 0:
                 mpath.sub_mpaths[pos[0]] = sub(mpath.sub_mpaths[pos[0]], mpath_add, pos[1:len(pos)])
@@ -102,6 +122,7 @@ class MappedPath():
                 return(mpath)
         self.sub_mpaths = sub(self, mpath_add, pos).sub_mpaths
     def rem_mpath_at_pos(self, pos):
+        '''description: takes in a position and removes the mapped path object at that position | parameters: int[] pos | return: None'''
         def sub(mpath, pos):
             print('new_pos:', pos)
             if len(pos) > 1:
@@ -112,14 +133,17 @@ class MappedPath():
                 return(mpath)
         self.sub_mpaths = sub(self, pos).sub_mpaths
     def move_mpath_at_pos(self, pos_from, pos_to):
+        '''description: takes in two positions and moves a mapped path object from one position to the other | parameters: int[] pos_from, int[] pos_to| return: None'''
         mpath = self.get_mpath_at_pos(pos_from)
         self.rem_mpath_at_pos(pos_from)
         self.add_mpath_at_pos(mpath, pos_to)
     def update_mpath_at_pos(self, mpath, pos):
+        '''description: takes in a mapped path and a postion, and set's the mpath at the position to the mpath taken in | parameters: MappedPath mpath | return: None'''
         self.rem_mpath_at_pos(pos)
         self.add_mpath_at_pos(mpath, pos)
 
     def make_ctime_unique(self): # CHANGE THIS to work with updated search functions, remove refresh
+        '''description: checks if there are duplicate creation times within a mapped path and if so increments the ctime by a few nanoseconds | parameters: None | return: None'''
         def mod_ctime(path, mod_size):
             timestamp = int((os.path.getctime(path) * 10000000) + 116444736000000000 + (10 * mod_size))
             ctime = wintypes.FILETIME(timestamp & 0xFFFFFFFF, timestamp >> 32)
@@ -143,11 +167,13 @@ class MappedPath():
                 make_ctime_unique_recur(sub_mpath)
         make_ctime_unique_recur(self)
     def refresh(self):
+        '''description: refreshes a mapped path object using the actual directory | parameters: None | return: None '''
         if os.path.isdir(self.path):
             self.sub_mpaths = [MappedPath(p.path) for p in os.scandir(self.path)]
 
     #output#
     def get_mpath_str(self):
+        '''description: returns a string version of itself | parameters: None | return: string mpath_str'''
         def make_id_str(mpath):
             return(mpath.path + '*' + str(mpath.ctime) + '*' + str(mpath.mtime))
         def get_mpath_str_recur(mpath):
@@ -161,10 +187,9 @@ class MappedPath():
             return(mpath_str)
         return(get_mpath_str_recur(self))
 
-#testing#
+#MAIN#
 if __name__ == '__main__':
-    test_mpath = MappedPath('a*0*0<b*0*0<c*0*0<d*0*0<>d1*0*0<e*0*0<>>>>b1*0*0<>>')
-    print(test_mpath.get_mpath_str())
+    print(help(MappedPath))
 
 # Author: Jack Paul Martin
 # Start: idk, Completion: 10/20/2020ish

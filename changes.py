@@ -2,53 +2,61 @@
 # Description: Can find changes to a mpath using a saved version of the mpath before changes.
 # Notes: root is the top mpath's path
 
+#TOD0#
 #do#
-# DO actions
-# DO funcs
+# actions
+# funcs
 
-#init#
+#add
+# None
+
+#test#
+# None
+
+#INIT#
 class Add():
     def __init__(self, path):
         self.type = 'add'
         self.path = path
     def action(self):
-        return
+        pass
 class Delete():
     def __init__(self, path):
         self.type = 'del'
         self.path = path
     def action(self):
-        return
+        pass
 class Move():
     def __init__(self, src_path, dest_path):
         self.type = 'mov'
         self.src = src_path
         self.dest = dest_path
     def action(self):
-        return
+        pass
 class Update():
     def __init__(self, path):
         self.type = 'upd'
         self.path = path
     def action(self):
-        return
+        pass
 
 def get_changes(old, new):
     #init#
     changes = []
     #find changes#
-    # get updates
-    # get moves
-    # get deletes
+    # get updates (use mod date)
+    # get moves (use name and path)
+    # get deletes ()
     # get adds
     #ret#
     return(changes)
-def get_conflicts(changes_a, changes_b):
+def merge_changes(changes_a, changes_b):
     #init#
-    #find conflicts#
-    # get update conflicts (w del)
-    # get move conflicts (w del)
-    # order move and updates to prevent move update conflicts?
+    # split changes by type
+    # merge same type changes
+    # find update conflicts
+    # find move conflicts
+    # merge changes - updates, moves, adds deletes
     #ret#
     return
 
