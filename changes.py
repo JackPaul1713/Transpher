@@ -44,7 +44,7 @@ def get_changes(old, new):
     #init#
     changes = []
     #find changes#
-    # get updates (use mod date)
+    # get updates (use mod date) - go through old recur and search each one
     # get moves (use name and path)
     # get deletes ()
     # get adds

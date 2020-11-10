@@ -23,7 +23,7 @@ class MappedPath():
     description: makes a map of a directory and all it's sub directories and files using their path , creation time, and modification time or a mpath_str
     parameters: string path, string[] exclusions or string mpath.
     '''
-    def __init__(self, init, exclusions=None):
+    def __init__(self, init, exclusions=[]):
         if 'C:\\' in init and '<' not in init: # if init is a directory # ADD exclusions here
             #init#
             path = init
@@ -35,8 +35,8 @@ class MappedPath():
             if os.path.isdir(path):
                 self.sub_mpaths = []
                 for p in os.scandir(self.path):
-                    if p not in exclusions:
-                        self.sub_mpaths.append(MappedPath(p.path))
+                    if p.path not in exclusions:
+                        self.sub_mpaths.append(MappedPath(p.path, exclusions))
             else:
                 self.sub_mpaths = []
         elif '<' in init: # if init is a mapped string
@@ -67,42 +67,42 @@ class MappedPath():
                         end = c
                         break
                 if end >= start:
-                    self.sub_mpaths.append(MappedPath(sub_mpaths_str[0:end+1]))
+                    self.sub_mpaths.append(MappedPath(sub_mpaths_str[0:end + 1]))
                 sub_mpaths_str = sub_mpaths_str[end+1:len(sub_mpaths_str)]
 
     #search#
-    def search(self, mpath_find): # CHANGE THIS, return a position list, pos[]
-        '''description: takes in a mapped path object and recursively searches itself for the mapped path and returns its position | parameters: self, MappedPath mpath_find | return: int[] pos'''
-        def search_recur(mpath, mpath_find):
+    def search(self, mpath_find, func=lambda mpath: mpath.ctime):
+        '''description: takes in a mapped path object and recursively searches itself for the mapped path and returns its position | parameters: self, MappedPath mpath_find, lambda func (optional) | return: int[] pos'''
+        def search_recur(mpath, mpath_find, func):
             #init#
             pos = []
             #search mpath#
-            if mpath.ctime == mpath_find.ctime:
+            if func(mpath) == func(mpath_find):
                 return([])
             #search sub_mpath#
             for i in range(len(mpath.sub_mpaths)):
-                ret = search_recur(mpath.sub_mpaths[i], mpath_find)
+                ret = search_recur(mpath.sub_mpaths[i], mpath_find, func)
                 if ret != None:
                     pos = ret
                     pos.insert(0, i)
                     return(pos)
-        return(search_recur(self, mpath_find))
-    def search_dup(self, mpath_find): # CHANGE THIS, return a position list, pos[]
-        '''description: takes in a mapped path object and recursively searches itself for duplicate of the mapped path and return its position | parameters: self, MappedPath mpath_find | return: int[] pos'''
-        def search_recur(mpath, mpath_find):
+        return(search_recur(self, mpath_find, func))
+    def search_dup(self, mpath_find, func=lambda mpath: mpath.ctime):
+        '''description: takes in a mapped path object and recursively searches itself for duplicate of the mapped path and return its position | parameters: self, MappedPath mpath_find, lambda func (optional) | return: int[] pos'''
+        def search_recur(mpath, mpath_find, func):
             #init#
             pos = []
             #search mpath#
-            if mpath.ctime == mpath_find.ctime and mpath != mpath_find:
+            if func(mpath) == func(mpath_find) and mpath != mpath_find:
                 return([])
             #search sub_mpath#
             for i in range(len(mpath.sub_mpaths)):
-                ret = search_recur(mpath.sub_mpaths[i], mpath_find)
+                ret = search_recur(mpath.sub_mpaths[i], mpath_find, func)
                 if ret != None:
                     pos = ret
                     pos.insert(0, i)
                     return(pos)
-        return(search_recur(self, mpath_find))
+        return(search_recur(self, mpath_find, func))
 
     #modify#
     def get_mpath_at_pos(self, pos):
@@ -189,7 +189,9 @@ class MappedPath():
 
 #MAIN#
 if __name__ == '__main__':
-    print(help(MappedPath))
+    mpath = MappedPath('C:\\Users\\JackPaul\\Documents\\Info', exclusions=['C:\\Users\\JackPaul\\Documents\\Info\\3D Printing'])
+    print(mpath.get_mpath_str())
+    print(mpath.search(MappedPath('C:\\Users\\JackPaul\\Documents\\Info\\3D Printing')))
 
 # Author: Jack Paul Martin
 # Start: idk, Completion: 10/20/2020ish
