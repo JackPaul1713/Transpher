@@ -16,7 +16,7 @@ if __name__ == '__main__':
     mpath_new = mapping.MappedPath(contents[1])
     changes = changes.get_changes(mpath_old, mpath_new)
     for change in changes:
-        print('{} {}'.format(change.type, change.ctime))
+        print('{} {} {}'.format(change.type, change.name, change.ctime))
     file.close()
 
 # Author: Jack Paul Martin
