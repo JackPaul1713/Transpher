@@ -39,43 +39,49 @@ class Move():
 class Update():
     def __init__(self, ctime):
         self.type = 'upd'
-        self.name = 
+        self.name =
         self.ctime = ctime
     def action(self):
         pass
 
 def get_changes(mpath_old, mpath_new): # DO
     #init#
-    def get_plus_recur(mpath_o, mpath_n):
+    def get_plus_recur(mpath_n, mpath_old, mpath_new):
         #init#
         changes = []
         #get changes mpath#
         #add#
-        if mpath_o.search(mpath_n) == None:
+        if mpath_old.search(mpath_n) == None:
             changes.append(Add(mpath_n.ctime))
+            mpath_old.add_mpath_at_pos(mpath_new.get_pos_of(mpath_n), mpath_n)
         else:
             #update#
-            if mpath_o.get_mpath_at_pos(mpath_o.search(mpath_n)).mtime != mpath_n.mtime:
+            if mpath_old.get_mpath_at_pos(mpath_old.search(mpath_n)).mtime != mpath_n.mtime:
                 changes.append(Update(mpath_n.ctime))
+                temp = mpath_old.get_mpath_at_pos(mpath_old.search(mpath_n))
+                temp.mtime = mpath_n.mtime
+                mpath_old.update_mpath_at_pos(mpath_new.get_pos_of(mpath_n), temp)
             #move#
-            if mpath_o.get_mpath_at_pos(mpath_o.search(mpath_n)).path != mpath_n.path:
+            if mpath_old.get_mpath_at_pos(mpath_old.search(mpath_n)).path != mpath_n.path:
                 changes.append(Move(mpath_n.ctime, mpath_n.path))
+                mpath_old.move_mpath_at_pos(mpath_old.search(mpath_n), mpath_new.search(mpath_n))
         #get changes sub_mpaths#
-        for mpath in mpath_n.sub_mpaths:
-            changes = changes + get_plus_recur(mpath_o, mpath)
+        for mpath_n in mpath_n.sub_mpaths:
+            changes = changes + get_plus_recur(mpath_n, mpath_old, mpath_new)
         return(changes)
-    def get_minus_recur(mpath_o, mpath_n):
+    def get_minus_recur(mpath_o, mpath_old, mpath_new):
         #init#
         changes = []
         #get changes mpath#
         #del#
-        if mpath_n.search(mpath_o) == None:
+        if mpath_new.search(mpath_o) == None:
             changes.append(Delete(mpath_o.ctime))
+            mpath_old.rem_mpath_at_pos(mpath_old.search(mpath_o))
         #get changes sub_mpaths#
-        for mpath in mpath_o.sub_mpaths:
-            changes = changes + get_minus_recur(mpath, mpath_n)
+        for mpath_o in mpath_old.sub_mpaths:
+            changes = changes + get_minus_recur(mpath_o, mpath_old, mpath_new)
         return(changes)
-    changes = get_plus_recur(mpath_old, mpath_new) + get_minus_recur(mpath_old, mpath_new)
+    changes = get_plus_recur(mpath_new, mpath_old, mpath_new) + get_minus_recur(mpath_old, mpath_old, mpath_new)
     return(changes)
 def merge_changes(changes_a, changes_b):  # Look into what causes conflicts more... order and type may matter
     #init#
