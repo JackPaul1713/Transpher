@@ -4,18 +4,16 @@
 
 #TOD0#
 #add#
-# None
-
+# none
 #do#
-# None
-
+# none
 #test#
 # exclusions
 
 #INIT#
 #imports#
 import os
-from ctypes import windll, wintypes, byref
+import resources
 
 #objects#
 class MappedPath():
@@ -32,21 +30,19 @@ class MappedPath():
             self.name = path.split('\\')[-1]
             self.ctime = os.path.getctime(path)
             self.mtime = os.path.getmtime(path)
+            self.sub_mpaths = []
             if os.path.isdir(path):
-                self.sub_mpaths = []
                 for p in os.scandir(self.path):
                     if p.path not in exclusions:
                         self.sub_mpaths.append(MappedPath(p.path, exclusions))
-            else:
-                self.sub_mpaths = []
         elif '<' in init: # if init is a mapped string
             #init#
             mpath_str = init
             def init_id_str(mpath, id_str):
                 mpath.path = id_str.split('*')[0]
                 mpath.name = mpath.path.split('\\')[-1]
-                mpath.mtime = str(id_str.split('*')[2])
-                mpath.ctime = str(id_str.split('*')[1])
+                mpath.ctime = float(id_str.split('*')[1])
+                mpath.mtime = float(id_str.split('*')[2])
                 mpath.sub_mpaths = []
             #cut#
             id_str = mpath_str[0:mpath_str.find('<')]
@@ -144,12 +140,6 @@ class MappedPath():
 
     def make_ctime_unique(self): # CHANGE THIS to work with updated search functions, remove refresh
         '''description: checks if there are duplicate creation times within a mapped path and if so increments the ctime by a few nanoseconds | parameters: None | return: None'''
-        def mod_ctime(path, mod_size):
-            timestamp = int((os.path.getctime(path) * 10000000) + 116444736000000000 + (10 * mod_size))
-            ctime = wintypes.FILETIME(timestamp & 0xFFFFFFFF, timestamp >> 32)
-            handle = windll.kernel32.CreateFileW(path, 256, 0, None, 3, 128, None)
-            windll.kernel32.SetFileTime(handle, byref(ctime), None, None)
-            windll.kernel32.CloseHandle(handle)
         def make_ctime_unique_recur(mpath):
             counter = 1
             #make ctime unique for mpath#
@@ -157,7 +147,7 @@ class MappedPath():
                 if self.search_dup(mpath) != None:
                     mpath_dup_pos = self.search_dup(mpath)
                     mpath_dup = self.get_mpath_at_pos(mpath_dup_pos)
-                    mod_ctime(mpath_dup.path, counter)
+                    resources.mod_ctime(mpath_dup.path, counter)
                     self.update_mpath_at_pos(MappedPath(mpath_dup.path), mpath_dup_pos)
                     counter += 1
                 else:
@@ -189,9 +179,8 @@ class MappedPath():
 
 #MAIN#
 if __name__ == '__main__':
-    mpath = MappedPath('C:\\Users\\JackPaul\\Documents\\Info', exclusions=['C:\\Users\\JackPaul\\Documents\\Info\\3D Printing'])
-    print(mpath.get_mpath_str())
-    print(mpath.search(MappedPath('C:\\Users\\JackPaul\\Documents\\Info\\3D Printing')))
+    #testing#
+    print('no testing at this point')
 
 # Author: Jack Paul Martin
 # Start: idk, Completion: 10/20/2020ish

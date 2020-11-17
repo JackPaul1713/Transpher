@@ -11,52 +11,84 @@
 # funcs
 
 #test#
-# None
+# get_changes
 
 #INIT#
 class Add():
-    def __init__(self, path):
+    def __init__(self, ctime):
         self.type = 'add'
-        self.path = path
+        self.name =
+        self.ctime = ctime
     def action(self):
         pass
 class Delete():
-    def __init__(self, path):
+    def __init__(self, ctime):
         self.type = 'del'
-        self.path = path
+        self.name =
+        self.ctime = ctime
     def action(self):
         pass
 class Move():
-    def __init__(self, src_path, dest_path):
+    def __init__(self, ctime, new_path):
         self.type = 'mov'
-        self.src = src_path
-        self.dest = dest_path
+        self.name =
+        self.ctime = ctime
+        self.new_path = new_path
     def action(self):
         pass
 class Update():
-    def __init__(self, path):
+    def __init__(self, ctime):
         self.type = 'upd'
-        self.path = path
+        self.name = 
+        self.ctime = ctime
     def action(self):
         pass
 
-def get_changes(old, new):
+def get_changes(mpath_old, mpath_new): # DO
     #init#
-    changes = []
-    #find changes#
-    # get updates (use mod date) - go through old recur and search each one
-    # get moves (use name and path)
-    # get deletes ()
-    # get adds
-    #ret#
+    def get_plus_recur(mpath_o, mpath_n):
+        #init#
+        changes = []
+        #get changes mpath#
+        #add#
+        if mpath_o.search(mpath_n) == None:
+            changes.append(Add(mpath_n.ctime))
+        else:
+            #update#
+            if mpath_o.get_mpath_at_pos(mpath_o.search(mpath_n)).mtime != mpath_n.mtime:
+                changes.append(Update(mpath_n.ctime))
+            #move#
+            if mpath_o.get_mpath_at_pos(mpath_o.search(mpath_n)).path != mpath_n.path:
+                changes.append(Move(mpath_n.ctime, mpath_n.path))
+        #get changes sub_mpaths#
+        for mpath in mpath_n.sub_mpaths:
+            changes = changes + get_plus_recur(mpath_o, mpath)
+        return(changes)
+    def get_minus_recur(mpath_o, mpath_n):
+        #init#
+        changes = []
+        #get changes mpath#
+        #del#
+        if mpath_n.search(mpath_o) == None:
+            changes.append(Delete(mpath_o.ctime))
+        #get changes sub_mpaths#
+        for mpath in mpath_o.sub_mpaths:
+            changes = changes + get_minus_recur(mpath, mpath_n)
+        return(changes)
+    changes = get_plus_recur(mpath_old, mpath_new) + get_minus_recur(mpath_old, mpath_new)
     return(changes)
-def merge_changes(changes_a, changes_b):
+def merge_changes(changes_a, changes_b):  # Look into what causes conflicts more... order and type may matter
     #init#
-    # split changes by type
-    # merge same type changes
-    # find update conflicts
-    # find move conflicts
-    # merge changes - updates, moves, adds deletes
+    merged_changes = []
+    #merge#
+    for change_a in changes_a:
+        for change_b in changes_b():
+            if change_a.ctime == change_b.ctime and (change_a.type == 'del' or change_b.type == 'del'):
+                print('Conflict:')
+                print('1. {} {} {}')
+                print('2. {} {} {}')
+                override = input('Override: ')
+                # More here
     #ret#
     return
 
