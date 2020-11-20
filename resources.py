@@ -16,7 +16,7 @@ import os
 from ctypes import windll, wintypes, byref
 
 #func#
-def mod_ctime(path, mod_size):
+def mod_ctime(path, mod_size=1):
     '''description: changes the creation time of a file | parameters: string path, int mod_size | return: None '''
     timestamp = int((os.path.getctime(path) * 10000000) + 116444736000000000 + (10 * mod_size))
     ctime = wintypes.FILETIME(timestamp & 0xFFFFFFFF, timestamp >> 32)

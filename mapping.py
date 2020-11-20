@@ -4,9 +4,13 @@
 
 #TOD0#
 #add#
-# none
+# boolean dir to MappedPath class
+# boolean dir to both __init__ branches
+# boolean dir to mpath_str
+
 #do#
 # none
+
 #test#
 # exclusions
 
@@ -101,26 +105,27 @@ class MappedPath():
         return(search_recur(self, mpath_find, func))
 
     #modify#
-    def get_mpath_at_pos(self, pos):
+    def get_mpath(self, pos):
         '''description: takes in position and returns the mapped path object at that position| parameters: self, int[] pos | return: MappedPath mpath'''
         mpath = self
         for p in pos:
             mpath = mpath.sub_mpaths[p]
         return(mpath)
-    def add_mpath_at_pos(self, mpath_add, pos):
+    def add_mpath(self, mpath_add, pos):
         '''description: takes in a mapped path object and position and adds the mpath at that position | parameters: self, MappedPath mpath_add, int[] pos | return: None'''
         def sub(mpath, mpath_add, pos):
-            if len(pos) > 0:
+            if len(pos) > 1:
                 mpath.sub_mpaths[pos[0]] = sub(mpath.sub_mpaths[pos[0]], mpath_add, pos[1:len(pos)])
                 return(mpath)
-            elif len(pos) == 0:
-                mpath.sub_mpaths.append(mpath_add)
+            elif len(pos) == 1:
+                mpath.sub_mpaths.insert(pos[0], mpath_add)
                 return(mpath)
         self.sub_mpaths = sub(self, mpath_add, pos).sub_mpaths
-    def rem_mpath_at_pos(self, pos):
+    def remove_mpath(self, pos):
         '''description: takes in a position and removes the mapped path object at that position | parameters: int[] pos | return: None'''
+        if len(pos) < 1:
+            raise Exception('ValueError:', 'len(pos) must be >= 1')
         def sub(mpath, pos):
-            print('new_pos:', pos)
             if len(pos) > 1:
                 mpath.sub_mpaths[pos[0]] = sub(mpath.sub_mpaths[pos[0]], pos[1:len(pos)])
                 return(mpath)
@@ -128,30 +133,34 @@ class MappedPath():
                 mpath.sub_mpaths.pop(pos[0])
                 return(mpath)
         self.sub_mpaths = sub(self, pos).sub_mpaths
-    def move_mpath_at_pos(self, pos_from, pos_to):
+    def move_mpath(self, pos_from, pos_to):
         '''description: takes in two positions and moves a mapped path object from one position to the other | parameters: int[] pos_from, int[] pos_to| return: None'''
-        mpath = self.get_mpath_at_pos(pos_from)
-        self.rem_mpath_at_pos(pos_from)
-        self.add_mpath_at_pos(mpath, pos_to)
-    def update_mpath_at_pos(self, mpath, pos):
+        mpath = self.get_mpath(pos_from)
+        self.remove_mpath(pos_from)
+        self.add_mpath(mpath, pos_to)
+    def update_mpath(self, mpath, pos):
         '''description: takes in a mapped path and a postion, and set's the mpath at the position to the mpath taken in | parameters: MappedPath mpath | return: None'''
-        self.rem_mpath_at_pos(pos)
-        self.add_mpath_at_pos(mpath, pos)
+        if len(pos) == 0:
+            self = mpath
+            return
+        self.remove_mpath(pos)
+        self.add_mpath(mpath, pos)
 
-    def make_ctime_unique(self): # CHANGE THIS to work with updated search functions, remove refresh
+    def make_ctimes_unique(self):
         '''description: checks if there are duplicate creation times within a mapped path and if so increments the ctime by a few nanoseconds | parameters: None | return: None'''
-        def make_ctime_unique_recur(mpath):
-            counter = 1
-            #make ctime unique for mpath#
+        def make_ctime_unique(mpath):
             while True:
                 if self.search_dup(mpath) != None:
                     mpath_dup_pos = self.search_dup(mpath)
-                    mpath_dup = self.get_mpath_at_pos(mpath_dup_pos)
-                    resources.mod_ctime(mpath_dup.path, counter)
-                    self.update_mpath_at_pos(MappedPath(mpath_dup.path), mpath_dup_pos)
-                    counter += 1
+                    mpath_dup = self.get_mpath(mpath_dup_pos)
+                    resources.mod_ctime(mpath_dup.path)
+                    self.update_mpath(MappedPath(mpath_dup.path), mpath_dup_pos)
+                    make_ctime_unique(mpath_dup)
                 else:
                     break
+        def make_ctime_unique_recur(mpath):
+            #make ctime unique for mpath#
+            make_ctime_unique(mpath)
             #make ctime unique for sub_mpaths#
             for sub_mpath in mpath.sub_mpaths:
                 make_ctime_unique_recur(sub_mpath)
@@ -180,7 +189,9 @@ class MappedPath():
 #MAIN#
 if __name__ == '__main__':
     #testing#
-    print('no testing at this point')
+    mpath = MappedPath('a*0*0*0<b*1*0*0<d*0*0*0<5*0*0*0<>>2*0*0*0<>>c*0*0*0<3*0*0*0<>4*0*0*0<>>>')
+    print(mpath.get_mpath_str())
+    # print('no testing at this point')
 
 # Author: Jack Paul Martin
 # Start: idk, Completion: 10/20/2020ish
