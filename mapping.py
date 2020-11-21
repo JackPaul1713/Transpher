@@ -189,9 +189,7 @@ class MappedPath():
 #MAIN#
 if __name__ == '__main__':
     #testing#
-    mpath = MappedPath('a*0*0*0<b*1*0*0<d*0*0*0<5*0*0*0<>>2*0*0*0<>>c*0*0*0<3*0*0*0<>4*0*0*0<>>>')
-    print(mpath.get_mpath_str())
-    # print('no testing at this point')
+    print('no testing at this point')
 
 # Author: Jack Paul Martin
-# Start: idk, Completion: 10/20/2020ish
+# Start: idk, Completion: 10/20/2020ish, small changes afterwards tho
