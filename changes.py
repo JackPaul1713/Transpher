@@ -1,6 +1,6 @@
 # Program Name: changes
 # Description: Can find changes to a mpath using a saved version of the mpath before changes.
-# Notes: root is the top mpath's path
+# Notes: root is the top mpath's path, use default MappedPath MappedAttributes
 
 #TOD0#
 #change#
