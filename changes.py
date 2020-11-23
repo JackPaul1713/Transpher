@@ -19,6 +19,10 @@
 #INIT#
 #objects#
 class Add():
+    """
+    addition change in a file path
+    parameters: string name, float ctime
+    """
     def __init__(self, name, ctime):
         self.type = 'add'
         self.name = name
@@ -26,6 +30,10 @@ class Add():
     def action(self):
         pass
 class Delete():
+    """
+    delete change in a file path
+    parameters: string name, float ctime
+    """
     def __init__(self, name, ctime):
         self.type = 'del'
         self.name = name
@@ -33,6 +41,10 @@ class Delete():
     def action(self):
         pass
 class Move():
+    """
+    move change in a file path
+    parameters: string name, float ctime, string new_path
+    """
     def __init__(self, name, ctime, new_path):
         self.type = 'mov'
         self.name = name
@@ -41,6 +53,10 @@ class Move():
     def action(self):
         pass
 class Update():
+    """
+    update change in a file path
+    parameters: string name, float ctime
+    """
     def __init__(self, name, ctime):
         self.type = 'upd'
         self.name = name
@@ -50,6 +66,10 @@ class Update():
 
 #funcs#
 def get_changes(mpath_old, mpath_new): # DO
+    """
+    gets the changes between two similar mapped paths
+    parameters: MappedPath mpath_old, MappedPath mpath_new | return: mixed[] changes
+    """
     #init#
     def get_plus_recur(mpath_n, mpath_old, mpath_new):
         #init#

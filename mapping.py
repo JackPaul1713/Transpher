@@ -20,11 +20,11 @@ import os
 import resources
 
 #objects#
-class MappedPath():
-    '''
+class MappedPath:
+    """
     makes a map of a directory and all it's sub directories and files using their path, creation time, and modification time or a mpath_str
     parameters: (string path, string[] exclusions) or (string mpath)
-    '''
+    """
     def __init__(self, init, mattribs, exclusions=[]):
         if 'C:\\' in init and '<' not in init: # if init is a directory # ADD exclusions here
             #init#
@@ -70,7 +70,10 @@ class MappedPath():
 
     #search#
     def search(self, mpath_find, func=lambda mpath: mpath.ctime):
-        '''description: takes in a mapped path object and recursively searches itself for the mapped path and returns its position | parameters: self, MappedPath mpath_find, lambda func (optional) | return: int[] pos'''
+        """
+        takes in a mapped path object and recursively searches itself for the mapped path and returns its position
+        parameters: self, MappedPath mpath_find, lambda func (optional) | return: int[] pos
+        """
         def search_recur(mpath, mpath_find, func):
             #init#
             pos = []
@@ -86,7 +89,10 @@ class MappedPath():
                     return(pos)
         return(search_recur(self, mpath_find, func))
     def search_dup(self, mpath_find, func=lambda mpath: mpath.ctime):
-        '''description: takes in a mapped path object and recursively searches itself for duplicate of the mapped path and return its position | parameters: self, MappedPath mpath_find, lambda func (optional) | return: int[] pos'''
+        """
+        takes in a mapped path object and recursively searches itself for duplicate of the mapped path and return its position
+        parameters: self, MappedPath mpath_find, lambda func (optional) | return: int[] pos
+        """
         def search_recur(mpath, mpath_find, func):
             #init#
             pos = []
@@ -104,13 +110,19 @@ class MappedPath():
 
     #modify#
     def get_mpath(self, pos):
-        '''description: takes in position and returns the mapped path object at that position| parameters: self, int[] pos | return: MappedPath mpath'''
+        """
+        takes in position and returns the mapped path object at that position
+        parameters: self, int[] pos | return: MappedPath mpath
+        """
         mpath = self
         for p in pos:
             mpath = mpath.sub_mpaths[p]
         return(mpath)
     def add_mpath(self, mpath_add, pos):
-        '''description: takes in a mapped path object and position and adds the mpath at that position | parameters: self, MappedPath mpath_add, int[] pos | return: None'''
+        """
+        takes in a mapped path object and position and adds the mpath at that position
+        parameters: self, MappedPath mpath_add, int[] pos | return: none
+        """
         def sub(mpath, mpath_add, pos):
             if len(pos) > 1:
                 mpath.sub_mpaths[pos[0]] = sub(mpath.sub_mpaths[pos[0]], mpath_add, pos[1:len(pos)])
@@ -120,7 +132,10 @@ class MappedPath():
                 return(mpath)
         self.sub_mpaths = sub(self, mpath_add, pos).sub_mpaths
     def remove_mpath(self, pos):
-        '''description: takes in a position and removes the mapped path object at that position | parameters: int[] pos | return: None'''
+        """
+        takes in a position and removes the mapped path object at that position
+        parameters: int[] pos | return: none
+        """
         if len(pos) < 1:
             raise Exception('ValueError:', 'len(pos) must be >= 1')
         def sub(mpath, pos):
@@ -132,12 +147,18 @@ class MappedPath():
                 return(mpath)
         self.sub_mpaths = sub(self, pos).sub_mpaths
     def move_mpath(self, pos_from, pos_to):
-        '''description: takes in two positions and moves a mapped path object from one position to the other | parameters: int[] pos_from, int[] pos_to| return: None'''
+        """
+        takes in two positions and moves a mapped path object from one position to the other
+        parameters: int[] pos_from, int[] pos_to| return: none
+        """
         mpath = self.get_mpath(pos_from)
         self.remove_mpath(pos_from)
         self.add_mpath(mpath, pos_to)
     def update_mpath(self, mpath, pos):
-        '''description: takes in a mapped path and a postion, and set's the mpath at the position to the mpath taken in | parameters: MappedPath mpath | return: None'''
+        """
+        takes in a mapped path and a postion, and set's the mpath at the position to the mpath taken in
+        parameters: MappedPath mpath | return: None
+        """
         if len(pos) == 0:
             self = mpath
             return
@@ -145,7 +166,10 @@ class MappedPath():
         self.add_mpath(mpath, pos)
 
     def make_ctimes_unique(self):
-        '''description: checks if there are duplicate creation times within a mapped path and if so increments the ctime by a few nanoseconds | parameters: None | return: None'''
+        """
+        checks if there are duplicate creation times within a mapped path and if so increments the ctime by a few nanoseconds
+        parameters: none | return: none
+        """
         def make_ctime_unique(mpath):
             while True:
                 if self.search_dup(mpath) != None:
@@ -164,13 +188,19 @@ class MappedPath():
                 make_ctime_unique_recur(sub_mpath)
         make_ctime_unique_recur(self)
     def refresh(self):
-        '''description: refreshes a mapped path object using the actual directory | parameters: None | return: None '''
+        """
+        refreshes a mapped path object using the actual directory
+        parameters: none | return: none
+        """
         if os.path.isdir(self.path):
             self.sub_mpaths = [MappedPath(p.path) for p in os.scandir(self.path)]
 
     #output#
     def get_mpath_str(self, mattribs):
-        '''description: returns a string version of itself | parameters: None | return: string mpath_str'''
+        """
+        returns a string version of itself
+        parameters: None | return: string mpath_str
+        """
         def make_id_str(mpath):
             id_str = ''
             for mattrib in mattribs:
@@ -188,11 +218,11 @@ class MappedPath():
             return(mpath_str)
         return(get_mpath_str_recur(self))
 
-class MappedAttribute():
-    '''
+class MappedAttribute:
+    """
     custom attributes for MappedPaths
     parameters: (func declaration, func id_declaration, int position)
-    '''
+    """
     def __init__(self, declaration, id_declaration, call):
         self.declaration = declaration
         self.id_declaration = id_declaration
