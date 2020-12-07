@@ -71,7 +71,7 @@ def get_changes(mpath_old, mpath_new): # DO
     parameters: MappedPath mpath_old, MappedPath mpath_new | return: mixed[] changes
     """
     #init#
-    def get_plus_recur(mpath_n, mpath_old, mpath_new):
+    def get_pos_changes(mpath_n, mpath_old, mpath_new):
         #init#
         changes = []
         #get changes mpath#
@@ -92,9 +92,9 @@ def get_changes(mpath_old, mpath_new): # DO
                 # mpath_old.move_mpath(mpath_old.search(mpath_n), mpath_new.search(mpath_n))
         #get changes sub_mpaths#
         for sub_mpath_n in mpath_n.sub_mpaths:
-            changes = changes + get_plus_recur(sub_mpath_n, mpath_old, mpath_new)
+            changes = changes + get_pos_changes(sub_mpath_n, mpath_old, mpath_new)
         return(changes)
-    def get_minus_recur(mpath_o, mpath_old, mpath_new):
+    def get_neg_changes(mpath_o, mpath_old, mpath_new):
         #init#
         changes = []
         #get changes mpath#
@@ -104,9 +104,9 @@ def get_changes(mpath_old, mpath_new): # DO
             # mpath_old.remove_mpath(mpath_old.search(mpath_o))
         #get changes sub_mpaths#
         for sub_mpath_o in mpath_o.sub_mpaths:
-            changes = changes + get_minus_recur(sub_mpath_o, mpath_old, mpath_new)
+            changes = changes + get_neg_changes(sub_mpath_o, mpath_old, mpath_new)
         return(changes)
-    changes = get_plus_recur(mpath_new, mpath_old, mpath_new) + get_minus_recur(mpath_old, mpath_old, mpath_new)
+    changes = get_pos_changes(mpath_new, mpath_old, mpath_new) + get_neg_changes(mpath_old, mpath_old, mpath_new)
     return(changes)
 def merge_changes(changes_a, changes_b):  # Look into what causes conflicts more... order and type may matter
     #init#

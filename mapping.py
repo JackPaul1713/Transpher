@@ -40,18 +40,16 @@ class MappedPath:
         elif '<' in init: # if init is a mapped string
             #init#
             mpath_str = init
-            def init_id_str(mpath, id_str):
-                i = 0
-                for mattrib in mattribs:
-                    mattrib.id_declaration(self, id_str.split('*')[i])
-                    i += 1
-                mpath.sub_mpaths = []
             #cut#
             id_str = mpath_str[0:mpath_str.find('<')]
             sub_mpaths_str = mpath_str[mpath_str.find('<')+1:len(mpath_str)-1]
-            #init_id_str, construct#
-            init_id_str(self, id_str)
-            #split_mpaths_str, construct#
+            #construct#
+            i = 0
+            for mattrib in mattribs:
+                mattrib.id_declaration(self, id_str.split('*')[i])
+                i += 1
+            self.sub_mpaths = []
+            #split mpaths_str, construct#
             while len(sub_mpaths_str) != 0:
                 start = sub_mpaths_str.find('<')
                 end = 0
@@ -65,7 +63,7 @@ class MappedPath:
                         end = c
                         break
                 if end >= start:
-                    self.sub_mpaths.append(MappedPath(sub_mpaths_str[0:end + 1]))
+                    self.sub_mpaths.append(MappedPath(sub_mpaths_str[0:end + 1], mattribs))
                 sub_mpaths_str = sub_mpaths_str[end+1:len(sub_mpaths_str)]
 
     #search#
@@ -74,39 +72,31 @@ class MappedPath:
         takes in a mapped path object and recursively searches itself for the mapped path and returns its position
         parameters: self, MappedPath mpath_find, lambda func (optional) | return: int[] pos
         """
-        def search_recur(mpath, mpath_find, func):
-            #init#
-            pos = []
-            #search mpath#
-            if func(mpath) == func(mpath_find):
-                return([])
-            #search sub_mpath#
-            for i in range(len(mpath.sub_mpaths)):
-                ret = search_recur(mpath.sub_mpaths[i], mpath_find, func)
-                if ret != None:
-                    pos = ret
-                    pos.insert(0, i)
-                    return(pos)
-        return(search_recur(self, mpath_find, func))
+        #search mpath#
+        if func(self) == func(mpath_find):
+            return([])
+        #search sub_mpath#
+        for i in range(len(self.sub_mpaths)):
+            pos = self.sub_mpaths[i].search(mpath_find, func)
+            if pos != None:
+                pos.insert(0, i)
+                return(pos)
+
     def search_dup(self, mpath_find, func=lambda mpath: mpath.ctime):
         """
         takes in a mapped path object and recursively searches itself for duplicate of the mapped path and return its position
         parameters: self, MappedPath mpath_find, lambda func (optional) | return: int[] pos
         """
-        def search_recur(mpath, mpath_find, func):
-            #init#
-            pos = []
-            #search mpath#
-            if func(mpath) == func(mpath_find) and mpath != mpath_find:
-                return([])
-            #search sub_mpath#
-            for i in range(len(mpath.sub_mpaths)):
-                ret = search_recur(mpath.sub_mpaths[i], mpath_find, func)
-                if ret != None:
-                    pos = ret
-                    pos.insert(0, i)
-                    return(pos)
-        return(search_recur(self, mpath_find, func))
+        #search mpath#
+        if func(self) == func(mpath_find) and self != mpath_find:
+            return([])
+        #search sub_mpath#
+        for i in range(len(self.sub_mpaths)):
+            ret = self.sub_mpaths[i].search_dup(mpath_find, func)
+            if ret != None:
+                pos = ret
+                pos.insert(0, i)
+                return(pos)
 
     #modify#
     def get_mpath(self, pos):
@@ -123,14 +113,10 @@ class MappedPath:
         takes in a mapped path object and position and adds the mpath at that position
         parameters: self, MappedPath mpath_add, int[] pos | return: none
         """
-        def sub(mpath, mpath_add, pos):
-            if len(pos) > 1:
-                mpath.sub_mpaths[pos[0]] = sub(mpath.sub_mpaths[pos[0]], mpath_add, pos[1:len(pos)])
-                return(mpath)
-            elif len(pos) == 1:
-                mpath.sub_mpaths.insert(pos[0], mpath_add)
-                return(mpath)
-        self.sub_mpaths = sub(self, mpath_add, pos).sub_mpaths
+        if len(pos) > 1:
+            self.sub_mpaths[pos[0]] = self.sub_mpaths[pos[0]].add_mpath(mpath_add, pos[1:len(pos)])
+        elif len(pos) == 1:
+            self.sub_mpaths.insert(pos[0], mpath_add)
     def remove_mpath(self, pos):
         """
         takes in a position and removes the mapped path object at that position
@@ -170,9 +156,11 @@ class MappedPath:
         checks if there are duplicate creation times within a mapped path and if so increments the ctime by a few nanoseconds
         parameters: none | return: none
         """
+        #init#
         def make_ctime_unique(mpath):
             while True:
                 if self.search_dup(mpath) != None:
+                    #get duplicate#
                     mpath_dup_pos = self.search_dup(mpath)
                     mpath_dup = self.get_mpath(mpath_dup_pos)
                     resources.mod_ctime(mpath_dup.path)
@@ -180,13 +168,11 @@ class MappedPath:
                     make_ctime_unique(mpath_dup)
                 else:
                     break
-        def make_ctime_unique_recur(mpath):
-            #make ctime unique for mpath#
-            make_ctime_unique(mpath)
-            #make ctime unique for sub_mpaths#
-            for sub_mpath in mpath.sub_mpaths:
-                make_ctime_unique_recur(sub_mpath)
-        make_ctime_unique_recur(self)
+        #make ctime unique for mpath#
+        make_ctime_unique(self)
+        #make ctime unique for sub_mpaths#
+        for sub_mpath in self.sub_mpaths:
+            sub_mpath.make_ctimes_unique()
     def refresh(self):
         """
         refreshes a mapped path object using the actual directory
@@ -201,22 +187,18 @@ class MappedPath:
         returns a string version of itself
         parameters: None | return: string mpath_str
         """
-        def make_id_str(mpath):
-            id_str = ''
-            for mattrib in mattribs:
-                id_str += str(mattrib.call(self)) + '*'
-            id_str = id_str[0:-1]
-            return(id_str)
-        def get_mpath_str_recur(mpath):
-            #add mpath#
-            mpath_str = make_id_str(mpath) + '<'
-            #add sub_mpaths#
-            for sub_dir in mpath.sub_mpaths:
-                mpath_str = mpath_str + get_mpath_str_recur(sub_dir)
-            #close mpath#
-            mpath_str = mpath_str + '>'
-            return(mpath_str)
-        return(get_mpath_str_recur(self))
+        #add mpath#
+        id_str = ''
+        for mattrib in mattribs:
+            id_str += str(mattrib.call(self)) + '*'
+        mpath_str = id_str[0:-1] + '<'
+        #add sub_mpaths#
+        for sub_dir in self.sub_mpaths:
+            mpath_str += sub_dir.get_mpath_str(mattribs)
+        #close mpath#
+        mpath_str = mpath_str + '>'
+        #ret#
+        return(mpath_str)
 
 class MappedAttribute:
     """
@@ -274,8 +256,18 @@ default_mattribs = [path_mattrib, name_mattrib, ctime_mattrib, mtime_mattrib, di
 #MAIN#
 if __name__ == '__main__':
     #testing#
-    mpath = MappedPath('C:\\Users\\JackPaul\\Documents\\Info', [ctime_mattrib])
-    print(mpath.get_mpath_str([ctime_mattrib]))
+    mpath = MappedPath('C:\\Users\\JackPaul\\Documents\\Info', default_mattribs)
+    mpath_str = mpath.get_mpath_str(default_mattribs)
+    print(mpath_str)
+    mpath = MappedPath(mpath_str, default_mattribs)
+    mpath_str = mpath.get_mpath_str(default_mattribs)
+    print(mpath_str)
+    mpath_find = MappedPath('Path*Mullen*0*0*True<>', default_mattribs)
+    print(mpath_find.name)
+    for sub_mpath in mpath.sub_mpaths:
+        print(sub_mpath.name, end=', ')
+    print('\b\b')
+    print(mpath.search(mpath_find, lambda mpath: mpath.name))
 
 # Author: Jack Paul Martin
-# Start: idk, Completion: 10/20/2020ish, small changes afterwards tho
+# Start: idk, Completion: 12/7/2020ish
