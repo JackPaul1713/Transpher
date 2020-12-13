@@ -11,7 +11,7 @@
 #do#
 # none
 
-#test#
+#testdir#
 # exclusions
 
 #INIT#
@@ -19,16 +19,68 @@
 import os
 import resources
 
-#objects#
+#object#
+class MappedAttribute:
+    """
+    custom attributes for MappedPaths
+    parameters: (func declaration, func id_declaration, int position)
+    """
+    def __init__(self, declaration, id_declaration, call):
+        self.declaration = declaration
+        self.id_declaration = id_declaration
+        self.call = call
+
+#func#
+def dec_path(self, path):
+    self.path = path
+def dec_name(self, path):
+    self.name = path.split('\\')[-1]
+def dec_ctime(self, path):
+    self.ctime = os.path.getctime(path)
+def dec_mtime(self, path):
+    self.mtime = os.path.getmtime(path)
+def dec_dir(self, path):
+    self.dir = os.path.isdir(path)
+
+def idec_path(self, path):
+    self.path = path
+def idec_name(self, name):
+    self.name = name
+def idec_ctime(self, ctime):
+    self.ctime = float(ctime)
+def idec_mtime(self, mtime):
+    self.mtime = float(mtime)
+def idec_dir(self, dir):
+    self.dir = bool(dir)
+
+def call_path(self):
+    return(self.path)
+def call_name(self):
+    return(self.name)
+def call_ctime(self):
+    return(self.ctime)
+def call_mtime(self):
+    return(self.mtime)
+def call_dir(self):
+    return(self.dir)
+
+#var#
+path_mattrib = MappedAttribute(dec_path, idec_path, call_path)
+name_mattrib = MappedAttribute(dec_name, idec_name, call_name)
+ctime_mattrib = MappedAttribute(dec_ctime, idec_ctime, call_ctime)
+mtime_mattrib = MappedAttribute(dec_mtime, idec_mtime, call_mtime)
+dir_mattrib = MappedAttribute(dec_dir, idec_dir, call_dir)
+
+default_mattribs = [path_mattrib, name_mattrib, ctime_mattrib, mtime_mattrib, dir_mattrib]
+
+#object#
 class MappedPath:
     """
     makes a map of a directory and all it's sub directories and files using their path, creation time, and modification time or a mpath_str
     parameters: (string path, string[] exclusions) or (string mpath)
     """
-    def __init__(self, init, mattribs, exclusions=[]):
-        if 'C:\\' in init and '<' not in init: # if init is a directory # ADD exclusions here
-            #init#
-            path = init
+    def __init__(self, path=None, mpath_str=None, mattribs=default_mattribs, exclusions=[]):
+        if path != None:
             #construct#
             for mattrib in mattribs:
                 mattrib.declaration(self, path)
@@ -36,10 +88,8 @@ class MappedPath:
             if os.path.isdir(path):
                 for p in os.scandir(path):
                     if p.path not in exclusions:
-                        self.sub_mpaths.append(MappedPath(p.path, mattribs, exclusions))
-        elif '<' in init: # if init is a mapped string
-            #init#
-            mpath_str = init
+                        self.sub_mpaths.append(MappedPath(p.path, mattribs=mattribs, exclusions=exclusions))
+        elif path == None and mpath_str != None:
             #cut#
             id_str = mpath_str[0:mpath_str.find('<')]
             sub_mpaths_str = mpath_str[mpath_str.find('<')+1:len(mpath_str)-1]
@@ -63,7 +113,7 @@ class MappedPath:
                         end = c
                         break
                 if end >= start:
-                    self.sub_mpaths.append(MappedPath(sub_mpaths_str[0:end + 1], mattribs))
+                    self.sub_mpaths.append(MappedPath(mpath_str=sub_mpaths_str[0:end + 1], mattribs=mattribs))
                 sub_mpaths_str = sub_mpaths_str[end+1:len(sub_mpaths_str)]
 
     #search#
@@ -182,7 +232,7 @@ class MappedPath:
             self.sub_mpaths = [MappedPath(p.path) for p in os.scandir(self.path)]
 
     #output#
-    def get_mpath_str(self, mattribs):
+    def get_mpath_str(self, mattribs=default_mattribs):
         """
         returns a string version of itself
         parameters: None | return: string mpath_str
@@ -199,75 +249,6 @@ class MappedPath:
         mpath_str = mpath_str + '>'
         #ret#
         return(mpath_str)
-
-class MappedAttribute:
-    """
-    custom attributes for MappedPaths
-    parameters: (func declaration, func id_declaration, int position)
-    """
-    def __init__(self, declaration, id_declaration, call):
-        self.declaration = declaration
-        self.id_declaration = id_declaration
-        self.call = call
-
-#func#
-def dec_path(self, path):
-    self.path = path
-def dec_name(self, path):
-    self.name = path.split('\\')[-1]
-def dec_ctime(self, path):
-    self.ctime = os.path.getctime(path)
-def dec_mtime(self, path):
-    self.mtime = os.path.getmtime(path)
-def dec_dir(self, path):
-    self.dir = os.path.isdir(path)
-
-def idec_path(self, path):
-    self.path = path
-def idec_name(self, name):
-    self.name = name
-def idec_ctime(self, ctime):
-    self.ctime = float(ctime)
-def idec_mtime(self, mtime):
-    self.mtime = float(mtime)
-def idec_dir(self, dir):
-    self.dir = bool(dir)
-
-def call_path(self):
-    return(self.path)
-def call_name(self):
-    return(self.name)
-def call_ctime(self):
-    return(self.ctime)
-def call_mtime(self):
-    return(self.mtime)
-def call_dir(self):
-    return(self.dir)
-
-#var#
-path_mattrib = MappedAttribute(dec_path, idec_path, call_path)
-name_mattrib = MappedAttribute(dec_name, idec_name, call_name)
-ctime_mattrib = MappedAttribute(dec_ctime, idec_ctime, call_ctime)
-mtime_mattrib = MappedAttribute(dec_mtime, idec_mtime, call_mtime)
-dir_mattrib = MappedAttribute(dec_dir, idec_dir, call_dir)
-
-default_mattribs = [path_mattrib, name_mattrib, ctime_mattrib, mtime_mattrib, dir_mattrib]
-
-#MAIN#
-if __name__ == '__main__':
-    #testing#
-    mpath = MappedPath('C:\\Users\\JackPaul\\Documents\\Info', default_mattribs)
-    mpath_str = mpath.get_mpath_str(default_mattribs)
-    print(mpath_str)
-    mpath = MappedPath(mpath_str, default_mattribs)
-    mpath_str = mpath.get_mpath_str(default_mattribs)
-    print(mpath_str)
-    mpath_find = MappedPath('Path*Mullen*0*0*True<>', default_mattribs)
-    print(mpath_find.name)
-    for sub_mpath in mpath.sub_mpaths:
-        print(sub_mpath.name, end=', ')
-    print('\b\b')
-    print(mpath.search(mpath_find, lambda mpath: mpath.name))
 
 # Author: Jack Paul Martin
 # Start: idk, Completion: 12/7/2020ish

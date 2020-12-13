@@ -7,7 +7,7 @@
 # none
 #do#
 # none
-#test#
+#testdir#
 # none
 
 #INIT#

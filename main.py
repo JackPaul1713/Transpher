@@ -7,7 +7,7 @@
 # none
 #do#
 # none
-#test#
+#testdir#
 # none
 
 #INIT#
@@ -17,8 +17,7 @@ import changes
 
 #MAIN#
 if __name__ == '__main__':
-    #testing#
-    print('no testing at this point')
+    print('nothing yet')
 
 # Author: Jack Paul Martin
 # Start: 11/16/2020, Completion:
