@@ -1,7 +1,7 @@
 # Program Name: Transfer
 # File Name: settup
-# Description:
-# Notes:
+# Description: sets up two directories to be used for Transfer
+# Notes: requires a file
 
 #TOD0#
 # needs file with two identical(names) paths
@@ -14,4 +14,4 @@
 
 
 # Author: Jack Paul Martin
-# Start: 11/16/2020, Completion:
+# Start: 1/14/2021, Completion:

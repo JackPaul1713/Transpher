@@ -1,7 +1,7 @@
 # Program Name: Transfer
 # File Name: main
-# Description:
-# Notes:
+# Description: gets changes between two directories and merges, records, and applies them if necessary
+# Notes: requires a file
 
 #TOD0#
 #check#
@@ -30,4 +30,4 @@ if __name__ == '__main__':
         change.action()
 
 # Author: Jack Paul Martin
-# Start: 11/16/2020, Completion:
+# Start: 1/14/2021, Completion:

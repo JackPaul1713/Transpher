@@ -138,6 +138,7 @@ def sort_changes(changes):
     sorts changes to the order they should be made in
     parameters: list changes | return: dict changes
     '''
+    sorted_changes = {'add':[], 'mov':[], 'upd':[], 'del':[]}
     pass
 
 def soft_merge_changes(changes0, changes1):  # Look into what causes conflicts more... order and type may matter

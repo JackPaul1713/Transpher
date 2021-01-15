@@ -1,9 +1,8 @@
 # File Name: mapping
 # Description: maps a file system at a path
-# Notes: .mpath files should be for containing string versions of mapped paths
+# Notes: custom mapped attributes can be used for MappedPath
 
 #TOD0#
-# redo remove_mpath() to not use a sub function
 
 #INIT#
 #imports#
@@ -14,7 +13,7 @@ import resources
 class MappedAttribute:
     """
     custom attributes for MappedPaths
-    parameters: (func declaration, func id_declaration, int position)
+    parameters: func declaration, func id_declaration, func call
     """
     def __init__(self, declaration, id_declaration, call):
         self.declaration = declaration
