@@ -1,18 +1,9 @@
-# Program Name: mapping
-# Description: Maps out a path and records it. Uses created date as a unique id.
+# File Name: mapping
+# Description: maps a file system at a path
 # Notes: .mpath files should be for containing string versions of mapped paths
 
 #TOD0#
-#add#
-# boolean dir to MappedPath class
-# boolean dir to both __init__ branches
-# boolean dir to mpath_str
-
-#do#
-# none
-
-#testdir#
-# exclusions
+# redo remove_mpath() to not use a sub function
 
 #INIT#
 #imports#
@@ -36,9 +27,9 @@ def dec_path(self, path):
 def dec_name(self, path):
     self.name = path.split('\\')[-1]
 def dec_ctime(self, path):
-    self.ctime = os.path.getctime(path)
+    self.ctime = round(os.path.getctime(path), 3)
 def dec_mtime(self, path):
-    self.mtime = os.path.getmtime(path)
+    self.mtime = round(os.path.getmtime(path), 3)
 def dec_dir(self, path):
     self.dir = os.path.isdir(path)
 
@@ -164,7 +155,7 @@ class MappedPath:
         parameters: self, MappedPath mpath_add, int[] pos | return: none
         """
         if len(pos) > 1:
-            self.sub_mpaths[pos[0]] = self.sub_mpaths[pos[0]].add_mpath(mpath_add, pos[1:len(pos)])
+            self.sub_mpaths[pos[0]].add_mpath(mpath_add, pos[1:len(pos)])
         elif len(pos) == 1:
             self.sub_mpaths.insert(pos[0], mpath_add)
     def remove_mpath(self, pos):
@@ -174,14 +165,10 @@ class MappedPath:
         """
         if len(pos) < 1:
             raise Exception('ValueError:', 'len(pos) must be >= 1')
-        def sub(mpath, pos):
-            if len(pos) > 1:
-                mpath.sub_mpaths[pos[0]] = sub(mpath.sub_mpaths[pos[0]], pos[1:len(pos)])
-                return(mpath)
-            elif len(pos) == 1:
-                mpath.sub_mpaths.pop(pos[0])
-                return(mpath)
-        self.sub_mpaths = sub(self, pos).sub_mpaths
+        if len(pos) > 1:
+            self.sub_mpaths[pos[0]].remove_mpath(pos[1:len(pos)])
+        elif len(pos) == 1:
+            self.sub_mpaths.pop(pos[0])
     def move_mpath(self, pos_from, pos_to):
         """
         takes in two positions and moves a mapped path object from one position to the other
@@ -201,28 +188,6 @@ class MappedPath:
         self.remove_mpath(pos)
         self.add_mpath(mpath, pos)
 
-    def make_ctimes_unique(self):
-        """
-        checks if there are duplicate creation times within a mapped path and if so increments the ctime by a few nanoseconds
-        parameters: none | return: none
-        """
-        #init#
-        def make_ctime_unique(mpath):
-            while True:
-                if self.search_dup(mpath) != None:
-                    #get duplicate#
-                    mpath_dup_pos = self.search_dup(mpath)
-                    mpath_dup = self.get_mpath(mpath_dup_pos)
-                    resources.mod_ctime(mpath_dup.path)
-                    self.update_mpath(MappedPath(mpath_dup.path), mpath_dup_pos)
-                    make_ctime_unique(mpath_dup)
-                else:
-                    break
-        #make ctime unique for mpath#
-        make_ctime_unique(self)
-        #make ctime unique for sub_mpaths#
-        for sub_mpath in self.sub_mpaths:
-            sub_mpath.make_ctimes_unique()
     def refresh(self):
         """
         refreshes a mapped path object using the actual directory

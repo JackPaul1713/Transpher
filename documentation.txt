@@ -1,0 +1,10 @@
+Program: Transfer
+Purpose: Transfer is designed to transfer changes between two identical(paths) file systems using a server as a middle ground.
+Description:
+In order to keep changes consistent between file systems, the changes made have to be found.
+To do so the file system is mapped out and recorded. The map contains various info about the file system.
+The map can then be compared to future versions of the system to find what changed.
+The program then merges the changes with any pending changes(previously recorded) and either records or applies them depending on which machine is running the program and which machine the changes apply too.
+The program is scheduled to run on the machine on startup and periodically afterward.
+Outline:
+The program is divided into two parts, settup and main. *in progress*
