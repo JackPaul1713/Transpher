@@ -84,7 +84,7 @@ if __name__ == '__main__':
         disp_test_title('bind paths')
         resources.delete_file(test_dir1)
         resources.copy_file(test_dir0, test_dir1)
-        bind_paths(test_dir0, test_dir1)
+        bind_paths(mpath0, test_dir0, test_dir1)
         disp_test_output('compare ctimes between \"testdir\\original\" and \"testdir\\remix\"')
 
 # Author: Jack Paul Martin

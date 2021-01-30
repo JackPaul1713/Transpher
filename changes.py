@@ -2,13 +2,12 @@
 # Description: can find changes to a mpath using a saved version of the mpath before changes.
 
 #TOD0#
-# test actions for change objects, ADD, DEL, UPD, MOV
-# test soft merge
-# test modify functions
+# add clear_trans_action() to changes objects: ADD, DEL, MOV, UPD
+# clear_trans_action() at the end of action()
+# clear_trans_action() when removed in merge functions
 
 #INIT#
 #imports#
-import os
 import time
 import resources
 
@@ -430,10 +429,22 @@ def download_changes(changes):
         if delete:
             changes_str = changes_str + '/' + change_str
         else:
-            changes_str = changes_str + '|' + change_str
+            changes_str = changes_str + change_str
             delete = True
     #ret#
     return(changes_str)
+
+def is_empty(changes):
+    is_empty = 1
+    if len(changes['add']) > 0:
+        is_empty = 0
+    if len(changes['mov']) > 0:
+        is_empty = 0
+    if len(changes['upd']) > 0:
+        is_empty = 0
+    if len(changes['del']) > 0:
+        is_empty = 0
+    return(is_empty)
 
 #MAIN#
 #testing#
@@ -601,7 +612,7 @@ if __name__ == '__main__':
         binding.make_ctimes_unique(mpath0)
         resources.delete_file(test_dir1)
         resources.copy_file(test_dir0, test_dir1)
-        binding.bind_paths(test_dir0, test_dir1)
+        binding.bind_paths(mpath0, test_dir0, test_dir1)
         resources.make_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\symb\\$.txt')  # add
         resources.rename_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\alpha\\a.txt',
                               'C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\numb\\positive\\a.txt')  # move

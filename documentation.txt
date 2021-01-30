@@ -10,8 +10,8 @@ The map can then be compared to future versions of the system to find what chang
 The program then merges the changes with any pending changes(previously recorded) and either records or applies them depending on which machine is running the program and which machine the changes apply too.
 The program is scheduled to run on the machine on startup and periodically afterward.
 Description: *probably replace description*
-The program is divided into two parts, settup and main.
-Settup is run once manually on each machine and main is run automatically on the startup and periodically after on each.
+The program is divided into two parts, setup and main.
+Setup is run once manually on each machine and main is run automatically on the startup and periodically after on each.
 *in progress*
 
 Instructions:
