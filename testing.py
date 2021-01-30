@@ -18,7 +18,8 @@ def disp_test_output(output):
     print('output:', output, end='\n\n')
 
 #var#
-test_dir = 'testdir\\original'
+test_dir0 = 'testdir\\original'
+test_dir1 = 'testdir\\remix'
 
 #MAIN#
 if __name__ == '__main__':
@@ -29,6 +30,7 @@ if __name__ == '__main__':
     resources_switch = False
     #tests#
     if mapping_switch:
+        #title#
         print('mapping\n')
         #switches#
         mattributes_switch = False
@@ -46,15 +48,15 @@ if __name__ == '__main__':
             #tests#
             if init_switch:
                 disp_test_title('init path')
-                mpath = mapping.MappedPath(test_dir)
+                mpath = mapping.MappedPath(test_dir0)
                 mpath_str = mpath.get_mpath_str()
                 disp_test_output(mpath_str)
                 disp_test_title('init path with exclusions')
-                mpath_ex = mapping.MappedPath(test_dir, exclusions=[test_dir + '\\symb'])
+                mpath_ex = mapping.MappedPath(test_dir0, exclusions=[test_dir0 + '\\symb'])
                 mpath_ex_str = mpath_ex.get_mpath_str()
                 disp_test_output(mpath_ex_str)
                 disp_test_title('init path with different mapped attributes')
-                mpath_ma = mapping.MappedPath(test_dir, mattribs=[mapping.name_mattrib])
+                mpath_ma = mapping.MappedPath(test_dir0, mattribs=[mapping.name_mattrib])
                 mpath_ma_str = mpath_ma.get_mpath_str(mattribs=[mapping.name_mattrib])
                 disp_test_output(mpath_ma_str)
                 disp_test_title('init mpath_str')
@@ -62,12 +64,12 @@ if __name__ == '__main__':
                 mpath_s_str = mpath_s.get_mpath_str()
                 disp_test_output(mpath_s_str)
             if search_switch:
-                mpath = mapping.MappedPath(test_dir)
+                mpath = mapping.MappedPath(test_dir0)
                 disp_test_title('search for directory')
-                mpath_search_dir = mapping.MappedPath(mpath_str=test_dir + '\\symb*symb*0*0*True<>')
+                mpath_search_dir = mapping.MappedPath(mpath_str=test_dir0 + '\\symb*symb*0*0*True<>')
                 disp_test_output(mpath.search(mpath_search_dir, lambda mpath: mpath.name))
                 disp_test_title('search for file')
-                mpath_search_file = mapping.MappedPath(mpath_str=test_dir + '\\alpha\\a.txt*a.txt*0*0*False<>')
+                mpath_search_file = mapping.MappedPath(mpath_str=test_dir0 + '\\alpha\\a.txt*a.txt*0*0*False<>')
                 disp_test_output(mpath.search(mpath_search_file, lambda mpath: mpath.name))
                 disp_test_title('search for nonexistent')
                 disp_test_output(mpath.search(mpath_search_dir)) # ctime is 0
@@ -77,7 +79,7 @@ if __name__ == '__main__':
                 disp_test_output(mpath.search_dup(mpath_search_dir)) # ctime is 0
             if modify_switch:
                 disp_test_title('get')
-                mpath = mapping.MappedPath(test_dir, mattribs=[mapping.name_mattrib])
+                mpath = mapping.MappedPath(test_dir0, mattribs=[mapping.name_mattrib])
                 mpath_get = mpath.get_mpath([0])
                 mpath_get_str = mpath_get.get_mpath_str(mattribs=[mapping.name_mattrib])
                 disp_test_output('[0]: ' + mpath_get_str)
@@ -94,15 +96,21 @@ if __name__ == '__main__':
                 # TEST THIS
             if output_switch:
                 disp_test_title('get mapped path string') # uhh used for most of the previous tests lol
-                mpath = mapping.MappedPath(test_dir)
+                mpath = mapping.MappedPath(test_dir0)
                 mpath_str = mpath.get_mpath_str()
                 disp_test_output(mpath_str)
         print('')
     if changes_switch:
+        #title#
         print('changes\n')
+        #switches#
+        #test#
         print('')
     if resources_switch:
+        #title#
         print('resources\n')
+        #switches#
+        #test#
         print('')
 
 # Author: Jack Paul Martin
