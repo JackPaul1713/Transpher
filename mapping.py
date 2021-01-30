@@ -3,6 +3,8 @@
 # Notes: custom mapped attributes can be used for MappedPath
 
 #TOD0#
+# test mattributes
+# test mpath modifiers
 
 #INIT#
 #imports#
@@ -121,7 +123,20 @@ class MappedPath:
             if pos != None:
                 pos.insert(0, i)
                 return(pos)
-
+    def search_attrib(self, attrib_find, func):
+        """
+        takes in a mapped path object and recursively searches itself for the mapped path and returns its position
+        parameters: self, MappedPath mpath_find, lambda func (optional) | return: int[] pos
+        """
+        #search mpath#
+        if func(self) == attrib_find:
+            return([])
+        #search sub_mpath#
+        for i in range(len(self.sub_mpaths)):
+            pos = self.sub_mpaths[i].search_attrib(attrib_find, func)
+            if pos != None:
+                pos.insert(0, i)
+                return(pos)
     def search_dup(self, mpath_find, func=lambda mpath: mpath.ctime):
         """
         takes in a mapped path object and recursively searches itself for duplicate of the mapped path and return its position
@@ -214,5 +229,98 @@ class MappedPath:
         #ret#
         return(mpath_str)
 
+#MAIN#
+#testing#
+if __name__ == '__main__':
+    #init#
+    def disp_test_title(name):
+        print('test:', name)
+    def disp_test_output(output):
+        print('output:', output, end='\n\n')
+    test_dir = 'testdir\\original'
+
+    #title#
+    print('mapping testing\n')
+
+    #switches#
+    mattributes_switch = False
+    mpath_switch = True
+
+    #tests#
+    if mattributes_switch:
+        # TEST THIS
+        pass
+    if mpath_switch:
+        #switches#
+        init_switch = True
+        search_switch = True
+        modify_switch = True
+        output_switch = True
+        #tests#
+        if init_switch:
+            disp_test_title('init path')
+            mpath = MappedPath(test_dir)
+            mpath_str = mpath.get_mpath_str()
+            disp_test_output(mpath_str)
+
+            disp_test_title('init path with exclusions')
+            mpath_ex = MappedPath(test_dir, exclusions=[test_dir + '\\symb'])
+            mpath_ex_str = mpath_ex.get_mpath_str()
+            disp_test_output(mpath_ex_str)
+
+            disp_test_title('init path with different mapped attributes')
+            mpath_ma = MappedPath(test_dir, mattribs=[name_mattrib])
+            mpath_ma_str = mpath_ma.get_mpath_str(mattribs=[name_mattrib])
+            disp_test_output(mpath_ma_str)
+
+            disp_test_title('init mpath_str')
+            mpath_s = MappedPath(mpath_str=mpath_str)
+            mpath_s_str = mpath_s.get_mpath_str()
+            disp_test_output(mpath_s_str)
+        if search_switch:
+            mpath = MappedPath(test_dir)
+            disp_test_title('search for directory')
+            mpath_search_dir = MappedPath(mpath_str=test_dir + '\\symb*symb*0*0*True<>')
+            disp_test_output(mpath.search(mpath_search_dir, lambda mpath: mpath.name))
+
+            disp_test_title('search for file')
+            mpath_search_file = MappedPath(mpath_str=test_dir + '\\alpha\\a.txt*a.txt*0*0*False<>')
+            disp_test_output(mpath.search(mpath_search_file, lambda mpath: mpath.name))
+
+            disp_test_title('search for nonexistent')
+            disp_test_output(mpath.search(mpath_search_dir))  # ctime is 0
+
+            disp_test_title('search_dup for duplicate')
+            disp_test_output(mpath.search_dup(mpath_search_dir, lambda mpath: mpath.name))
+
+            disp_test_title('search_dup for nonexistent')
+            disp_test_output(mpath.search_dup(mpath_search_dir))  # ctime is 0
+        if modify_switch:
+            disp_test_title('get')
+            mpath = MappedPath(test_dir, mattribs=[name_mattrib])
+            mpath_get = mpath.get_mpath([0])
+            mpath_get_str = mpath_get.get_mpath_str(mattribs=[name_mattrib])
+            disp_test_output('[0]: ' + mpath_get_str)
+
+            disp_test_title('add')
+            mpath_add = mpath_get
+            mpath_add.add_mpath(mpath_get.get_mpath([0]), [1, 0])
+            mpath_add_str = mpath_add.get_mpath_str(mattribs=[name_mattrib])
+            disp_test_output('[0, 0]: ' + mpath_add_str)
+
+            disp_test_title('remove')
+            # TEST THIS
+
+            disp_test_title('move')
+            # TEST THIS
+
+            disp_test_title('update')
+            # TEST THIS
+        if output_switch:
+            disp_test_title('get mapped path string')  # uhh used for most of the previous tests lol
+            mpath = MappedPath(test_dir)
+            mpath_str = mpath.get_mpath_str()
+            disp_test_output(mpath_str)
+
 # Author: Jack Paul Martin
-# Start: idk, Completion: 12/7/2020ish
+# Start: idk, Completion: 1/29/2021

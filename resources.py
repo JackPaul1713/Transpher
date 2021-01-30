@@ -1,17 +1,17 @@
 # File Name: resources
 # Description: some resources
 
-#TOD0#
-
 #INIT#
 #imports#
 import os
 import datetime
+import shutil
 from win32file import CreateFile, SetFileTime, GetFileTime, CloseHandle
 from win32file import GENERIC_WRITE, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, FILE_SHARE_WRITE
 # from ctypes import windll, wintypes, byref
 
 #func#
+#time#
 def mod_ctime(path):
     """
     changes the creation time of a file
@@ -41,10 +41,46 @@ def set_time(path, ctime=None, atime=None, mtime=None):
     # windll.kernel32.SetFileTime(handle, byref(ctime), None, None)
     # windll.kernel32.CloseHandle(handle)
 
-#MAIN#
-if __name__ == '__main__':
-    #testing#
-    print('no testing at this point')
+#file_opts#
+def make_file(path):
+    """
+    makes a new file at the path
+    """
+    file = open(path, 'w')
+    file.close()
+def make_dir(path):
+    """
+    makes a new directory at the path
+    """
+    os.mkdir(path)
+def delete_file(path):
+    """
+    deletes the file at the path
+    """
+    if not os.path.isdir(path):
+        os.remove(path)
+    elif os.path.isdir(path):
+        shutil.rmtree(path)
+def write_file(path, mod):
+    """
+    writes to the file at path
+    """
+    file = open(path, 'w')  # update
+    file.write(mod)
+    file.close()
+def rename_file(old_path, new_path):
+    """
+    renames the file at path0 to path1
+    """
+    os.rename(old_path, new_path)
+def copy_file(src_path, dst_path):
+    """
+    copies a file from path0 to path1
+    """
+    if not os.path.isdir(src_path):
+        shutil.copyfile(src_path, dst_path)
+    elif os.path.isdir(src_path):
+        shutil.copytree(src_path, dst_path)
 
 # Author: Jack Paul Martin
-# Start: 11/16/2020, Completion: >1/14/2021
+# Start: 11/16/2020, Completion: 1/27/2021
