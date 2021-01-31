@@ -353,35 +353,35 @@ def upload_changes(changes_str):
     changes = {'add':[], 'mov':[], 'upd':[], 'del':[]}
     types = changes_str.split('|')
     if types[0] != '':
-        adds = types[0].split('/')
+        adds = types[0].split(':')
     else:
         adds = []
     if types[0] != '':
-        moves = types[1].split('/')
+        moves = types[1].split(':')
     else:
         moves = []
     if types[0] != '':
-        updates = types[2].split('/')
+        updates = types[2].split(':')
     else:
         updates = []
     if types[0] != '':
-        deletes = types[3].split('/')
+        deletes = types[3].split(':')
     else:
         deletes = []
     for add in adds:
-        elements = add.split(':')
+        elements = add.split('*')
         change = Add(*elements)
         changes['add'].append(change)
     for move in moves:
-        elements = move.split(':')
+        elements = move.split('*')
         change = Move(*elements)
         changes['mov'].append(change)
     for update in updates:
-        elements = update.split(':')
+        elements = update.split('*')
         change = Update(*elements)
         changes['upd'].append(change)
     for delete in deletes:
-        elements = delete.split(':')
+        elements = delete.split('*')
         change = Delete(*elements)
         changes['del'].append(change)
     return(changes)
@@ -398,36 +398,36 @@ def download_changes(changes):
     delete = False
     #add#
     for change in changes['add']:
-        change_str = '{}:{}:{}:{}:{}'.format(change.name, change.ctime, change.mtime, change.dst_name, change.dst_ctime)
+        change_str = '{}*{}*{}*{}*{}'.format(change.name, change.ctime, change.mtime, change.dst_name, change.dst_ctime)
         if add:
-            changes_str = changes_str + '/' + change_str
+            changes_str = changes_str + ':' + change_str
         else:
             changes_str = changes_str + change_str
             add = True
     #mov#
     changes_str += '|'
     for change in changes['mov']:
-        change_str = '{}:{}:{}:{}:{}'.format(change.name, change.ctime, change.mtime, change.dst_name, change.dst_ctime)
+        change_str = '{}*{}*{}*{}*{}'.format(change.name, change.ctime, change.mtime, change.dst_name, change.dst_ctime)
         if move:
-            changes_str = changes_str + '/' + change_str
+            changes_str = changes_str + ':' + change_str
         else:
             changes_str = changes_str + change_str
             move = True
     #upd#
     changes_str += '|'
     for change in changes['upd']:
-        change_str = '{}:{}:{}'.format(change.name, change.ctime, change.mtime)
+        change_str = '{}*{}*{}'.format(change.name, change.ctime, change.mtime)
         if update:
-            changes_str = changes_str + '/' + change_str
+            changes_str = changes_str + ':' + change_str
         else:
             changes_str = changes_str + change_str
             update = True
     #del#
     changes_str += '|'
     for change in changes['del']:
-        change_str = '{}:{}'.format(change.name, change.ctime)
+        change_str = '{}*{}'.format(change.name, change.ctime)
         if delete:
-            changes_str = changes_str + '/' + change_str
+            changes_str = changes_str + ':' + change_str
         else:
             changes_str = changes_str + change_str
             delete = True

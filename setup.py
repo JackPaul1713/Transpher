@@ -12,9 +12,6 @@
 
 #INIT#
 #imports#
-import load
-import mapping
-import binding
 import os
 import requests
 
@@ -38,73 +35,69 @@ if __name__ == '__main__':
     #input#
     print("1. machine0")
     print("2. machine1")
-    selection = input('Input: ')
+    selection = input('input: ')
     print('')
     if selection == '1':
         #title#
         print('SETUP PART 1')
-
         #input#
-        print("enter the location on the server for transfering files")
-        tpath = input('Input: ')
+        print("enter a name for the tfile")
+        tname = input('input: ') + '.tf'
         print("enter the first path")
-        path0 = input('Input: ')
+        path0 = input('input: ')
         print("enter the second path")
-        path1 = input('Input: ')
+        path1 = input('input: ')
         print("enter exclusions, 's' to stop")
         exclusions = []
         while True:
-            exclusion = input('Input: ')
+            exclusion = input('input: ')
             if exclusion != 's':
                 exclusions.append(exclusion)
             else:
                 break
-        exclusions0 = []
-        exclusions1 = []
-        for exclusion in exclusions:
-            exclusions0.append(path0 + exclusion)
-            exclusions1.append(path1 + exclusion)
-
+        #import#
+        tpath = os.getcwd()
+        download_files(tpath)
+        import load
+        import mapping
+        import binding
         #setup tfile#
-        tfile = load.Transfile(tpath, new=True)
+        tfile = load.TransFile(tname, tpath, new=True)
         tfile.machine[0] = os.environ['COMPUTERNAME']
         tfile.path[0] = path0
         tfile.path[1] = path1
-        tfile.exclusions[0] = exclusions0
-        tfile.exclusions[1] = exclusions1
+        for exclusion in exclusions:
+            tfile.exclusions[0].append(tfile.path[0] + exclusion)
+            tfile.exclusions[1].append(tfile.path[1] + exclusion)
         tfile.mpath[0] = mapping.MappedPath(tfile.path[0], exclusions=tfile.exclusions[0])
-
         #setup machine0#
         binding.make_ctimes_unique(tfile.mpath[0])
         tfile.mpath[0].refresh()
-
         #download#
         tfile.download()
-        download_files(tpath)
-
         #task#
         print('schedule a task to run main.py')
 
     if selection == '2':
         #title#
         print('SETUP PART 2')
-
         #input#
-        print("enter the location on the server for transfering files (same location as part 1)")
-        tpath = input('Input: ')
-
+        print("enter the name of the tfile (same as part 1)")
+        tname = input('input: ') + '.tf'
+        #import#
+        import load
+        import mapping
+        import binding
         #setup tfile#
-        tfile = load.Transfile(tpath).upload()
-        tfile.local_m[1] = os.environ['COMPUTERNAME']
-
+        tpath = os.getcwd()
+        tfile = load.TransFile(tname, tpath)
+        tfile.upload()
+        tfile.machine[1] = os.environ['COMPUTERNAME']
         #setup machine1#
         binding.bind_paths(tfile.mpath[0], tfile.path[0], tfile.path[1])
         tfile.mpath[1] = mapping.MappedPath(tfile.path[1], exclusions=tfile.exclusions[1])
-
         #download#
         tfile.download()
-        download_files(tpath)
-
         #task#
         print('schedule a task to run main.py')
 
