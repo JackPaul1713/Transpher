@@ -11,7 +11,7 @@ import changes
 #objects#
 class TransFile:
     def __init__(self, name, path, new=False):
-        if path != '':
+        if path != '' and name != '':
             path = path + '\\'
         self.tfile_path = path + name
         self.tpath = 0
