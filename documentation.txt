@@ -15,4 +15,7 @@ Setup is run once manually on each machine and main is run automatically on the 
 *in progress*
 
 Instructions:
+%USER%\Anaconda3
+%USER%\Anaconda3\scripts
+%USER%\Anaconda3\Library\bin
 *in progress*

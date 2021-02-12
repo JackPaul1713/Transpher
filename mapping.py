@@ -43,7 +43,10 @@ def idec_ctime(self, ctime):
 def idec_mtime(self, mtime):
     self.mtime = float(mtime)
 def idec_dir(self, dir):
-    self.dir = bool(dir)
+    if dir == "True":
+        self.dir = True
+    else:
+        self.dir = False
 
 def call_path(self):
     return(self.path)
@@ -88,6 +91,7 @@ class MappedPath:
             #construct#
             i = 0
             for mattrib in mattribs:
+                print(id_str.split('*')[i])
                 mattrib.id_declaration(self, id_str.split('*')[i])
                 i += 1
             self.sub_mpaths = []
