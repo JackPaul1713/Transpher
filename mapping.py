@@ -91,7 +91,6 @@ class MappedPath:
             #construct#
             i = 0
             for mattrib in mattribs:
-                print(id_str.split('*')[i])
                 mattrib.id_declaration(self, id_str.split('*')[i])
                 i += 1
             self.sub_mpaths = []
