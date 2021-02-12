@@ -352,37 +352,33 @@ def upload_changes(changes_str):
     """
     changes = {'add':[], 'mov':[], 'upd':[], 'del':[]}
     types = changes_str.split('|')
-    if types[0] != '':
-        adds = types[0].split(':')
-    else:
+    adds = types[0].split(':')
+    moves = types[1].split(':')
+    updates = types[2].split(':')
+    deletes = types[3].split(':')
+    if adds == ['']:
         adds = []
-    if types[0] != '':
-        moves = types[1].split(':')
-    else:
+    if moves == ['']:
         moves = []
-    if types[0] != '':
-        updates = types[2].split(':')
-    else:
+    if updates == ['']:
         updates = []
-    if types[0] != '':
-        deletes = types[3].split(':')
-    else:
+    if deletes == ['']:
         deletes = []
     for add in adds:
         elements = add.split('*')
-        change = Add(*elements)
+        change = Add(elements[0], float(elements[1]), float(elements[2]), elements[3], float(elements[4]))
         changes['add'].append(change)
     for move in moves:
         elements = move.split('*')
-        change = Move(*elements)
+        change = Move(elements[0], float(elements[1]), float(elements[2]), elements[3], float(elements[4]))
         changes['mov'].append(change)
     for update in updates:
         elements = update.split('*')
-        change = Update(*elements)
+        change = Update(elements[0], float(elements[1]), float(elements[2]))
         changes['upd'].append(change)
     for delete in deletes:
         elements = delete.split('*')
-        change = Delete(*elements)
+        change = Delete(elements[0], float(elements[1]))
         changes['del'].append(change)
     return(changes)
 def download_changes(changes):
@@ -477,7 +473,7 @@ if __name__ == '__main__':
         resources.copy_file(test_dir0, test_dir1)
         binding.bind_paths(test_dir0, test_dir1)
         resources.make_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\symb\\$.txt') # add
-        resources.rename_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\alpha\\a.txt',
+        resources.rename_file('/testdir/remix/numb/positive/a.txt',
                   'C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\numb\\positive\\a.txt') # move
         resources.write_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\symb\\!.txt', 'no') # update
         resources.delete_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\alpha\\d.txt') # del
@@ -577,7 +573,7 @@ if __name__ == '__main__':
         disp_test_output('check for \"testdir\\remix\\d.txt\"')
 
         disp_test_title('make changes, move')
-        resources.rename_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\alpha\\a.txt',
+        resources.rename_file('/testdir/remix/numb/positive/a.txt',
                               'C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\numb\\positive\\a.txt')
         mpath1 = mapping.MappedPath(test_dir1)
         changes = get_changes(mpath1, mpath0)  # old, new
@@ -614,7 +610,7 @@ if __name__ == '__main__':
         resources.copy_file(test_dir0, test_dir1)
         binding.bind_paths(mpath0, test_dir0, test_dir1)
         resources.make_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\symb\\$.txt')  # add
-        resources.rename_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\alpha\\a.txt',
+        resources.rename_file('/testdir/remix/numb/positive/a.txt',
                               'C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\numb\\positive\\a.txt')  # move
         resources.write_file('C:\\Users\\JackPaul\\PycharmProjects\\Transpher\\testdir\\remix\\symb\\!.txt',
                              'no')  # update
