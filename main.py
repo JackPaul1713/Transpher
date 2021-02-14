@@ -39,28 +39,55 @@ if __name__ == '__main__':
             exterior_m = 0
 
         #check# - get any changes on the local machine
-        print('check')
+        print('CHECK')
         mpath = mapping.MappedPath(tfile.path[local_m], exclusions=tfile.path[local_m])  # get new mpath to compare to the old one
         binding.make_ctimes_unique(mpath)  # make sure any new files have unique ctimes
         new_changes = changes.get_changes(tfile.mpath[local_m], mpath)  # compare old_mpath to new_mpath
-        print(mpath)  # DEBUG
-        print(tfile.mpath[local_m])  # DEBUG
-        print(new_changes)  # DEBUG
+
+        print('old mpath: ' + mpath.get_mpath_str())
+        print('new mpath: ' + tfile.mpath[local_m].get_mpath_str())
+        print('')
+        print('old changes(local):')
+        for change in tfile.changes[local_m]:
+            change.display()
+        print('')
+        print('new changes(local):')
+        for change in new_changes:
+            change.display()
+        print('')
+
         tfile.mpath[local_m] = mpath
         if not changes.is_empty(tfile.changes[local_m]): # if there are old changes
             tfile.changes[local_m] = changes.hard_merge_changes(tfile.changes[local_m], new_changes)  # add merged changes, merge old_changes with new_changes
+
+            print('merged changes(local):')
+            for change in new_changes:
+                change.display()
+            print('')
+
             changes.make_trans_changes(tfile.changes[local_m], tfile.tpath, tfile.mpath[local_m])  # make transitional changes so changes can be made
         elif not changes.is_empty(new_changes): # if there are no old changes but there are new ones
-            print("new_changes exist")  # DEBUG
             tfile.changes[local_m] = new_changes # add changes
             changes.make_trans_changes(tfile.changes[local_m], tfile.tpath, tfile.mpath[local_m])  # make transitional changes so changes can be made
 
         #apply# - merge any changes on the local machine with changes on the exterior machine and apply merged exterior changes(staged changes)
-        print('apply')
+        print('APPLY')
+        print('local changes:')
+        print('exterior changes:')
+        print('')
+
         if (not changes.is_empty(tfile.changes[local_m])) and (not changes.is_empty(tfile.changes[exterior_m])):  # if there are changes on the local and exterior machine
             tfile.changes[local_m], staged_changes = changes.soft_merge_changes(tfile.changes[local_m], tfile.changes[exterior_m])  # merge local and exterior changes
+
+            print('merged local changes:')
+            print('staged changes:')
+            print('')
+
             changes.make_changes(staged_changes, tfile.tpath, tfile.mpath[local_m])  # apply staged changes
-            tfile.changes[exterior_m] = {'add':[], 'del':[], 'mov':[], 'upd':[]}  # clear exterior changes (applied)
+            print('staged changes applied')
+            tfile.changes[exterior_m] = changes.empty_changes  # clear exterior changes (applied)
+        else:
+            print('no staged changes')
 
         #download#
         tfile.download()

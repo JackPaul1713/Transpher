@@ -12,8 +12,8 @@ import changes
 class TransFile:
     def __init__(self, name, path, new=False):
         if path != '' and name != '':
-            path = path + '\\'
-        self.tfile_path = path + name
+            path = path
+        self.tfile_path = path + '\\' + name
         self.tpath = 0
         self.machine = [0, 0]
         self.path = [0, 0]
@@ -30,8 +30,8 @@ class TransFile:
             self.exclusions[1] = []
             self.mpath[0] = mapping.MappedPath(mpath_str='a*a*0*0*False<>')
             self.mpath[1] = mapping.MappedPath(mpath_str='a*a*0*0*False<>')
-            self.changes[0] = {'add':[], 'del':[], 'mov':[], 'upd':[]}
-            self.changes[1] = {'add':[], 'del':[], 'mov':[], 'upd':[]}
+            self.changes[0] = changes.empty_changes
+            self.changes[1] = changes.empty_changes
     def upload(self):
         #read#
         file = open(self.tfile_path, 'r')

@@ -27,13 +27,13 @@ class Add():
     def action(self, src, mpath):
         loc = mpath.search_attrib(self.dst_ctime, lambda mpath: mpath.ctime)
         path = mpath.get_mpath(loc).path + '\\' + self.name
-        src = src + '\\' + self.name
+        src = src + '\\' + str(self.ctime) + str(self.mtime) + self.name
         resources.rename_file(src, path)
         resources.set_time(path, ctime=self.ctime, mtime=self.mtime)
     def trans_action(self, dst, mpath):
         loc = mpath.search_attrib(self.ctime, lambda mpath: mpath.ctime)
         path = mpath.get_mpath(loc).path
-        dst = dst + '\\' + self.name
+        dst = dst + '\\' + str(self.ctime) + str(self.mtime) + self.name
         resources.copy_file(path, dst)
     def display(self):
         print('add {} {} to {} {}'.format(self.name, self.ctime, self.dst_name, self.dst_ctime))
@@ -86,14 +86,14 @@ class Update():
     def action(self, src, mpath):
         loc = mpath.search_attrib(self.ctime, lambda mpath: mpath.ctime)
         path = mpath.get_mpath(loc).path
-        src = src + '\\' + self.name
+        src = src + '\\' + str(self.ctime) + str(self.mtime) + self.name
         resources.delete_file(path)
         resources.rename_file(src, path)
         resources.set_time(path, ctime=self.ctime, mtime=self.mtime)
     def trans_action(self, dst, mpath):
         loc = mpath.search_attrib(self.ctime, lambda mpath: mpath.ctime)
         path = mpath.get_mpath(loc).path
-        dst = dst + '\\' + self.name
+        dst = dst + '\\' + str(self.ctime) + str(self.mtime) + self.name
         resources.copy_file(path, dst)
     def display(self):
         print('update {} {} {}'.format(self.name, self.ctime, time.ctime(self.mtime)))
@@ -441,6 +441,9 @@ def is_empty(changes):
     if len(changes['del']) > 0:
         is_empty = 0
     return(is_empty)
+
+#var#
+empty_changes = {'add':[], 'del':[], 'mov':[], 'upd':[]}
 
 #MAIN#
 #testing#
