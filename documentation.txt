@@ -3,6 +3,16 @@ Purpose: Transfer is designed to transfer changes between two identical(paths) f
 in order to keep the same file system on two machines.
 Author: Jack Paul Martin
 
+Outline:
+setup
+main
+load
+mapping
+changes
+binding
+
+resources
+
 Description:
 In order to keep changes consistent between file systems, the changes made have to be found.
 To do so the file system is mapped out and recorded. The map contains various info about the file system.
