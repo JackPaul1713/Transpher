@@ -1,17 +1,28 @@
 # File Name: changes
 # Description: can find changes to a mpath using a saved version of the mpath before changes.
 
-#TOD0#
+
+
+
+#### TOD0 ####
+# make __init__() able to take in parameters or str_constructor
+# add __repr__() to changes objects: ADD, DEL, MOV, UPD
+# add __str__() to changes objects: ADD, DEL, MOV, UPD
 # add clear_trans_action() to changes objects: ADD, DEL, MOV, UPD
 # clear_trans_action() at the end of action()
 # clear_trans_action() when removed in merge functions
+# use __repr__() for download fuctions
 
-#INIT#
-#imports#
+
+
+
+#### INIT ####
+#### imports ####
 import time
 import resources
 
-#objects#
+
+#### objects ####
 class Add():
     """
     addition change in a file path
@@ -26,17 +37,18 @@ class Add():
         self.dst_ctime = dst_ctime
     def action(self, src, mpath):
         loc = mpath.search_attrib(self.dst_ctime, lambda mpath: mpath.ctime)
-        path = mpath.get_mpath(loc).path + '\\' + self.name
+        path = mpath.get_mpath_at(loc).path + '\\' + self.name
         src = src + '\\' + str(self.ctime) + str(self.mtime) + self.name
         resources.rename_file(src, path)
         resources.set_time(path, ctime=self.ctime, mtime=self.mtime)
     def trans_action(self, dst, mpath):
         loc = mpath.search_attrib(self.ctime, lambda mpath: mpath.ctime)
-        path = mpath.get_mpath(loc).path
+        path = mpath.get_mpath_at(loc).path
         dst = dst + '\\' + str(self.ctime) + str(self.mtime) + self.name
         resources.copy_file(path, dst)
     def display(self):
         print('add {} {} to {} {}'.format(self.name, self.ctime, self.dst_name, self.dst_ctime))
+
 class Delete():
     """
     delete change in a file path
@@ -48,10 +60,11 @@ class Delete():
         self.ctime = ctime
     def action(self, mpath):
         loc = mpath.search_attrib(self.ctime, lambda mpath: mpath.ctime)
-        path = mpath.get_mpath(loc).path
+        path = mpath.get_mpath_at(loc).path
         resources.delete_file(path)
     def display(self):
         print('delete {} {}'.format(self.name, self.ctime))
+
 class Move():
     """
     move change in a file path
@@ -66,13 +79,14 @@ class Move():
         self.dst_ctime = dst_ctime
     def action(self, mpath):
         loc0 = mpath.search_attrib(self.ctime, lambda mpath: mpath.ctime)
-        path0 = mpath.get_mpath(loc0).path
+        path0 = mpath.get_mpath_at(loc0).path
         loc1 = mpath.search_attrib(self.dst_ctime, lambda mpath: mpath.ctime)
-        path1 = mpath.get_mpath(loc1).path + '\\' + self.name
+        path1 = mpath.get_mpath_at(loc1).path + '\\' + self.name
         resources.rename_file(path0, path1)
         resources.set_time(path1, ctime=self.ctime, mtime=self.mtime)
     def display(self):
         print('move {} {} to {} {}'.format(self.name, self.ctime, self.dst_name, self.dst_ctime))
+
 class Update():
     """
     update change in a file path
@@ -85,20 +99,22 @@ class Update():
         self.mtime = mtime
     def action(self, src, mpath):
         loc = mpath.search_attrib(self.ctime, lambda mpath: mpath.ctime)
-        path = mpath.get_mpath(loc).path
+        path = mpath.get_mpath_at(loc).path
         src = src + '\\' + str(self.ctime) + str(self.mtime) + self.name
         resources.delete_file(path)
         resources.rename_file(src, path)
         resources.set_time(path, ctime=self.ctime, mtime=self.mtime)
     def trans_action(self, dst, mpath):
         loc = mpath.search_attrib(self.ctime, lambda mpath: mpath.ctime)
-        path = mpath.get_mpath(loc).path
+        path = mpath.get_mpath_at(loc).path
         dst = dst + '\\' + str(self.ctime) + str(self.mtime) + self.name
         resources.copy_file(path, dst)
     def display(self):
         print('update {} {} {}'.format(self.name, self.ctime, time.ctime(self.mtime)))
 
-#funcs#
+
+#### funcs ####
+    #### super ####
 def get_super_path(path):
     '''
     gets the path to the file that contains the file the input path leads to
@@ -117,9 +133,11 @@ def get_super_mpath(mpath, sub_mpath):
     parameters: MappedPath mpath, MappedPath sub_mpath | return: MappedPath super_mpath
     '''
     pos = mpath.search(sub_mpath)[0:-1]
-    super_mpath = mpath.get_mpath(pos)
+    super_mpath = mpath.get_mpath_at(pos)
     return(super_mpath)
 
+
+    #### changes ####
 def sort_changes(changes):
     '''
     sorts changes to the order they should be made in
@@ -158,7 +176,7 @@ def get_changes(old_mpath, new_mpath):
             changes.append(change)
         else:
             #move#
-            if get_super_mpath(old_mpath, old_mpath.get_mpath(old_mpath.search(mpath_n))).ctime != super_mpath_n.ctime:
+            if get_super_mpath(old_mpath, old_mpath.get_mpath_at(old_mpath.search(mpath_n))).ctime != super_mpath_n.ctime:
                 name = mpath_n.name
                 ctime = mpath_n.ctime
                 mtime = mpath_n.mtime
@@ -167,7 +185,7 @@ def get_changes(old_mpath, new_mpath):
                 change = Move(name, ctime, mtime, dst_name, dst_ctime)
                 changes.append(change)
             #update#
-            if old_mpath.get_mpath(old_mpath.search(mpath_n)).mtime != mpath_n.mtime:
+            if old_mpath.get_mpath_at(old_mpath.search(mpath_n)).mtime != mpath_n.mtime:
                 if not mpath_n.dir:
                     change = Update(mpath_n.name, mpath_n.ctime, mpath_n.mtime)
                     changes.append(change)
@@ -193,6 +211,8 @@ def get_changes(old_mpath, new_mpath):
     changes = sort_changes(changes)
     return(changes)
 
+
+    #### merging ####
 def hard_merge_changes(old_changes, new_changes):
     """
     merges old changes with newer ones within the same file system
@@ -241,6 +261,7 @@ def hard_merge_changes(old_changes, new_changes):
     merged_changes['del'] = new_changes['del'] + old_changes['del']
     #ret#
     return(merged_changes)
+
 def soft_merge_changes(local_changes, exterior_changes):  # Look into what causes conflicts more... order and type may matter
     """
     merges changes between two similar(identical before changes) file systems, and prompts the user to resolve conflicts
@@ -320,6 +341,8 @@ def soft_merge_changes(local_changes, exterior_changes):  # Look into what cause
     staged_changes = exterior_changes
     return(local_changes, staged_changes)
 
+
+    #### apply ####
 def make_trans_changes(changes, dst, mpath):
     """
     moves necessary files to a accessible location so that the changes can be made
@@ -331,6 +354,7 @@ def make_trans_changes(changes, dst, mpath):
     #upd#
     for change in changes['upd']:
         change.trans_action(dst, mpath)
+
 def make_changes(changes, src, mpath):
     """
     makes changes to a file system
@@ -345,6 +369,8 @@ def make_changes(changes, src, mpath):
     for change in changes['del']:
         change.action(mpath)
 
+
+    #### upload download ####
 def upload_changes(changes_str):
     """
     expands changes from a string

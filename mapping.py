@@ -157,7 +157,7 @@ class MappedPath:
                 return(pos)
 
     #modify#
-    def get_mpath(self, pos):
+    def get_mpath_at(self, pos):
         """
         takes in position and returns the mapped path object at that position
         parameters: self, int[] pos | return: MappedPath mpath
@@ -166,16 +166,16 @@ class MappedPath:
         for p in pos:
             mpath = mpath.sub_mpaths[p]
         return(mpath)
-    def add_mpath(self, mpath_add, pos):
+    def add_mpath_at(self, mpath_add, pos):
         """
         takes in a mapped path object and position and adds the mpath at that position
         parameters: self, MappedPath mpath_add, int[] pos | return: none
         """
         if len(pos) > 1:
-            self.sub_mpaths[pos[0]].add_mpath(mpath_add, pos[1:len(pos)])
+            self.sub_mpaths[pos[0]].add_mpath_at(mpath_add, pos[1:len(pos)])
         elif len(pos) == 1:
             self.sub_mpaths.insert(pos[0], mpath_add)
-    def remove_mpath(self, pos):
+    def remove_mpath_at(self, pos):
         """
         takes in a position and removes the mapped path object at that position
         parameters: int[] pos | return: none
@@ -183,18 +183,18 @@ class MappedPath:
         if len(pos) < 1:
             raise Exception('ValueError:', 'len(pos) must be >= 1')
         if len(pos) > 1:
-            self.sub_mpaths[pos[0]].remove_mpath(pos[1:len(pos)])
+            self.sub_mpaths[pos[0]].remove_mpath_at(pos[1:len(pos)])
         elif len(pos) == 1:
             self.sub_mpaths.pop(pos[0])
-    def move_mpath(self, pos_from, pos_to):
+    def move_mpath_at(self, pos_from, pos_to):
         """
         takes in two positions and moves a mapped path object from one position to the other
         parameters: int[] pos_from, int[] pos_to| return: none
         """
-        mpath = self.get_mpath(pos_from)
-        self.remove_mpath(pos_from)
-        self.add_mpath(mpath, pos_to)
-    def update_mpath(self, mpath, pos):
+        mpath = self.get_mpath_at(pos_from)
+        self.remove_mpath_at(pos_from)
+        self.add_mpath_at(mpath, pos_to)
+    def update_mpath_at(self, mpath, pos):
         """
         takes in a mapped path and a postion, and set's the mpath at the position to the mpath taken in
         parameters: MappedPath mpath | return: None
@@ -202,8 +202,8 @@ class MappedPath:
         if len(pos) == 0:
             self = mpath
             return
-        self.remove_mpath(pos)
-        self.add_mpath(mpath, pos)
+        self.remove_mpath_at(pos)
+        self.add_mpath_at(mpath, pos)
 
     def refresh(self):
         """
@@ -301,13 +301,13 @@ if __name__ == '__main__':
         if modify_switch:
             disp_test_title('get')
             mpath = MappedPath(test_dir, mattribs=[name_mattrib])
-            mpath_get = mpath.get_mpath([0])
+            mpath_get = mpath.get_mpath_at([0])
             mpath_get_str = mpath_get.get_mpath_str(mattribs=[name_mattrib])
             disp_test_output('[0]: ' + mpath_get_str)
 
             disp_test_title('add')
             mpath_add = mpath_get
-            mpath_add.add_mpath(mpath_get.get_mpath([0]), [1, 0])
+            mpath_add.add_mpath_at(mpath_get.get_mpath_at([0]), [1, 0])
             mpath_add_str = mpath_add.get_mpath_str(mattribs=[name_mattrib])
             disp_test_output('[0, 0]: ' + mpath_add_str)
 

@@ -1,6 +1,6 @@
 Program: Transfer
 Purpose: Transfer is designed to transfer changes between two identical(paths) file systems using a server as a middle ground,
-in order to keep the same file system on multiple machines.
+in order to keep the same file system on two machines.
 Author: Jack Paul Martin
 
 Description:
